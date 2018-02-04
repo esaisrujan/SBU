@@ -1,0 +1,48 @@
+2017-11-22 14:26:47,394 : Client 0: Client 0 sent request number 0 opration put('movie','star') to replica 0
+2017-11-22 14:26:47,394 : Client 1: Client 1 sent request number 0 opration put('jedi,'luke skywalker) to replica 0
+2017-11-22 14:26:47,394 : Client 0: prec is 0 rec is 0
+2017-11-22 14:26:47,394 : Client 1: prec is 0 rec is 0
+2017-11-22 14:26:47,425 : Client 0: Client received wedged_client
+2017-11-22 14:26:47,425 : Client 1: Client received wedged_client
+2017-11-22 14:26:49,903 : Client 0: Client received new config from olympus
+2017-11-22 14:26:49,919 : Client 1: Client received new config from olympus
+2017-11-22 14:26:49,919 : Client 1 : match is 3 min match is 3.0for rid 0 rid seen [0]
+2017-11-22 14:26:49,919 : Client 0: Result validation success for new config after receiving re-transmit result from olympus
+2017-11-22 14:26:49,919 : Client 1: Result validation success for new config after receiving re-transmit result from olympus
+2017-11-22 14:26:49,919 : Client 0: Client 0 result arrived  for rid 0
+2017-11-22 14:26:49,919 : Client 1: Client 1 result arrived  for rid 0
+2017-11-22 14:26:49,919 : Client 0: Client 0 sent request number 1 opration append('movie',' wars') to replica 0
+2017-11-22 14:26:49,919 : Client 1: Client 1 sent request number 1 opration slice('jedi','0:4') to replica 0
+2017-11-22 14:26:49,919 : Client 0: prec is 1 rec is 1
+2017-11-22 14:26:49,919 : Client 1: prec is 1 rec is 1
+2017-11-22 14:26:52,929 : Client 1: Client 1 timer expired for  request number 1 opration slice('jedi','0:4')
+')
+2017-11-22 14:26:52,929 : Client 1:  Client 1 sent  request number 1 operation slice('jedi','0:4') to all replicas after timeout
+2017-11-22 14:26:52,929 : Client 0:  Client 0 sent  request number 1 operation append('movie',' wars') to all replicas after timeout
+2017-11-22 14:26:55,947 : Client 0: Client received wedged_client
+2017-11-22 14:26:55,947 : Client 1: Client received wedged_client
+2017-11-22 14:26:55,947 : Client 0: Client received wedged_client
+2017-11-22 14:26:55,962 : Client 0: Client received wedged_client
+2017-11-22 14:26:55,962 : Client 1: Client received wedged_client
+2017-11-22 14:26:58,397 : Client 1: Client received new config from olympus
+2017-11-22 14:26:58,535 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,535 : Client 0: Result validation success after receiving result from tail for rid 1
+2017-11-22 14:26:58,535 : Client 0: Client 0 sent request number 2 opration append('movie',' wars') to replica 0
+2017-11-22 14:26:58,550 : Client 0: prec is 2 rec is 2
+2017-11-22 14:26:58,550 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,566 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,566 : Client 1: Result validation success after receiving result from tail for rid 1
+2017-11-22 14:26:58,566 : Client 1:  Client 1 sent fianl results to parent for checking
+2017-11-22 14:26:58,582 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,597 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,613 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,628 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,675 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,675 : Client 0: Result validation success after receiving result from tail for rid 2
+2017-11-22 14:26:58,675 : Client 0: Client 0 result arrived  for rid 2
+2017-11-22 14:26:58,675 : Client 0: Client 0 sent request number 3 opration append('movie',' wars') to replica 0
+2017-11-22 14:26:58,675 : Client 0: prec is 3 rec is 3
+2017-11-22 14:26:58,738 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 14:26:58,738 : Client 0: Result validation success after receiving result from tail for rid 3
+2017-11-22 14:26:58,738 : Client 0: Client 0 result arrived  for rid 3
+2017-11-22 14:26:58,738 : Client 0:  Client 0 sent fianl results to parent for checking

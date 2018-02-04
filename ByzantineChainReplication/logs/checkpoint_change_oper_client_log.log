@@ -1,0 +1,38 @@
+2017-11-22 02:22:14,101 : Client 0: Client 0 sent request number 0 opration put('movie','star') to replica 0
+2017-11-22 02:22:14,101 : Client 1: Client 1 sent request number 0 opration put('jedi,'luke skywalker) to replica 0
+2017-11-22 02:22:14,101 : Client 0: prec is 0 rec is 0
+2017-11-22 02:22:14,101 : Client 1: prec is 0 rec is 0
+2017-11-22 02:22:14,179 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 02:22:14,179 : Client 0: Result validation success after receiving result from tail for rid 0
+2017-11-22 02:22:14,179 : Client 0: Client 0 result arrived  for rid 0
+2017-11-22 02:22:14,179 : Client 0: Client 0 sent request number 1 opration append('movie',' wars') to replica 0
+2017-11-22 02:22:14,195 : Client 0: prec is 1 rec is 1
+2017-11-22 02:22:14,195 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 02:22:14,195 : Client 1: Result validation success after receiving result from tail for rid 0
+2017-11-22 02:22:14,195 : Client 1: Client 1 result arrived  for rid 0
+2017-11-22 02:22:14,195 : Client 1: Client 1 sent request number 1 opration slice('jedi','0:4') to replica 0
+2017-11-22 02:22:14,211 : Client 1: prec is 1 rec is 1
+2017-11-22 02:22:14,257 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 02:22:14,257 : Client 0: Result validation success after receiving result from tail for rid 1
+2017-11-22 02:22:14,257 : Client 0: Client 0 result arrived  for rid 1
+2017-11-22 02:22:14,257 : Client 0: Client 0 sent request number 2 opration  to replica 0
+2017-11-22 02:22:14,257 : Client 0: prec is 2 rec is 2
+2017-11-22 02:22:14,273 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 02:22:14,273 : Client 1: Result validation success after receiving result from tail for rid 1
+2017-11-22 02:22:14,273 : Client 1: Client 1 result arrived  for rid 1
+2017-11-22 02:22:14,273 : Client 1:  Client 1 sent fianl results to parent for checking
+2017-11-22 02:22:14,299 : Client 0: Client received wedged_client
+2017-11-22 02:22:14,299 : Client 1: Client received wedged_client
+2017-11-22 02:22:14,315 : Client 0: Client received wedged_client
+2017-11-22 02:22:14,315 : Client 1: Client received wedged_client
+2017-11-22 02:22:17,400 : Client 0: Client received new config from olympus
+2017-11-22 02:22:17,400 : Client 0 : match is 3 min match is 3.0for rid 2 rid seen [1, 1, 0]
+2017-11-22 02:22:17,400 : Client 0: Result validation success for new config after receiving re-transmit result from olympus
+2017-11-22 02:22:17,400 : Client 0: Client 0 timer expired for  request number 2 opration 
+2017-11-22 02:22:17,400 : Client 1: Client received new config from olympus
+2017-11-22 02:22:17,400 : Client 1 : match is 3 min match is 3.0for rid 1 rid seen [1, 1]
+2017-11-22 02:22:17,416 : Client 0:  Client 0 sent  request number 2 operation  to all replicas after timeout
+2017-11-22 02:22:17,416 : Client 0:  Client 0 sent fianl results to parent for checking
+2017-11-22 02:22:17,557 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 02:22:17,572 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 02:22:17,588 : Client 0:  tail to client signature success for rid +str(rid)

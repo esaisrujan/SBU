@@ -1,0 +1,42 @@
+2017-11-22 00:42:27,983 : Configuration 0 Olympus : Generated Signature keys for clients
+2017-11-22 00:42:27,983 : Configuration 0 Olympus : Generated Signature keys for replicas
+2017-11-22 00:42:28,102 : Configuration 0 Olympus received reconfig req from replica2 and sent the wedged request to replicas 
+2017-11-22 00:42:28,102 : Configuration 0 Olympus received wedged statement from replica  1 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:28,102 : Configuration 0 Olympus received wedged statement from replica  2 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:28,102 : Configuration 0 Olympus received wedged statement from replica  0 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:28,117 : Configuration 0 Olympus :enter history is {1: {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}, 2: {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}, 0: {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}}
+2017-11-22 00:42:28,117 : Configuration 0 Olympus received wedged statement from replica  4 with history {}
+2017-11-22 00:42:28,117 : Configuration 0 Olympus received wedged statement from replica  3 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus :lh calculated 
+2017-11-22 00:42:29,634 : Configuration 0longest history of comb (<replica:82004>, <replica:82006>, <replica:82008>) is {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:29,634 : catchup of replica 1is {}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus sent catch up msg  1
+2017-11-22 00:42:29,634 : catchup of replica 2is {}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus sent catch up msg  2
+2017-11-22 00:42:29,634 : catchup of replica 0is {}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus sent catch up msg  0
+2017-11-22 00:42:29,634 : replica  0 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:29,634 : replica  1 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:29,634 : replica  2 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:29,634 : replica  3 with history {0: ["put('movie','star')", 0, 0], 1: ["put('jedi,'luke skywalker)", 1, 0]}
+2017-11-22 00:42:29,634 : replica  4 with history {}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus received caught_up_res from replica  2
+2017-11-22 00:42:29,634 : Configuration 0 Olympus ckient_rs is {0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]]} from replica 2
+2017-11-22 00:42:29,634 : Configuration 0 Olympus received caught_up_res from replica  0
+2017-11-22 00:42:29,634 : Configuration 0 Olympus ckient_rs is {0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]]} from replica 0
+2017-11-22 00:42:29,634 : Configuration 0 Olympus received caught_up_res from replica  1
+2017-11-22 00:42:29,634 : Configuration 0 Olympus ckient_rs is {0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]]} from replica 1
+2017-11-22 00:42:29,634 : Configuration 0 Olympus dict keys are [2, 0, 1]
+2017-11-22 00:42:29,634 : Configuration 0 Olympus {'movie': 'star', 'jedi': 'luke skywalker'};{'movie': 'star', 'jedi': 'luke skywalker'}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus {'movie': 'star', 'jedi': 'luke skywalker'};{'movie': 'star', 'jedi': 'luke skywalker'}
+2017-11-22 00:42:29,634 : Configuration 0 Olympus caught_up_res matched for quorum
+2017-11-22 00:42:29,649 : <replica:82006>   [<replica:82008>, <replica:82004>, <replica:82006>, <replica:82007>, <replica:82005>]
+2017-11-22 00:42:29,649 : Configuration 0 Olympus received get_running_state_res from replica  2lh rep is 1
+2017-11-22 00:42:29,649 : Configuration 0 Olympus received get_running_state_res from replica  2 and they macthed
+2017-11-22 00:42:30,953 : Configuration 1 Olympus : new replicas created
+2017-11-22 00:42:30,968 : Configuration 1 Olympus : Generated Signature keys for new replicas
+2017-11-22 00:42:31,000 : Configuration 1 Olympus : Setup  and started new replicas + client_rs{0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]]}
+2017-11-22 00:42:31,000 : Configuration 1 Olympus :  new replicas info sent to client
+2017-11-22 00:42:31,000 : Configuration 1 Olympus :  new replicas info sent to client
+2017-11-22 00:42:35,074 : Parent Client : Final Results check passed for Client : 1
+2017-11-22 00:42:35,136 : Parent Client : Final Results check passed for Client : 0

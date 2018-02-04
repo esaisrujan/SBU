@@ -1,0 +1,1349 @@
+import sys
+import nacl.encoding
+import nacl.hash
+import nacl.signing
+from nacl.bindings.utils import sodium_memcmp
+from re import split
+import time
+import logging
+import os
+class replica(process):
+	def setup(a:bool, d :dict,history :dict,slot :int, r : list, idr : Process,c : list, public_key_dict : dict,pk : PrivateKey,replica_timeout :int ,head_timeout : int,failure : dict,olympus : Process,configuration : int,checkpoint : int):
+		self.s=0
+		self.terminate = a
+		self.d = d
+		self.temp_d=dict()
+		self.res=""
+		self.result = dict()
+		self.pk=pk
+		self.public_key_dict = public_key_dict
+		self.hr = dict()
+		self.slot=slot
+		self.history = history
+		self.orderproof = []
+		self.hashresult = []
+		self.checkpoint_proof=[]
+		self.wedged_history = dict()
+		self.rid_slot = dict()
+		self.idr= idr
+		self.fail = []
+		self.ncr= dict()
+		self.nfr= dict()
+		self.ns = dict()
+		self.nrs = dict()
+		self.cr = 0
+		self.co = 0
+		self.drs = 0
+		self.drop=0
+		self.crash = 0
+		self.truncate_history = 0
+		self.truncate_history_n=0
+		self.sleep = 0
+		self.increment_slot=0
+		self.extra_op = 0
+		self.invalid_order_sig = 0
+		self.invalid_result_sig = 0
+		self.drop_checkpt_stmts=0
+		self.checkpoint=checkpoint
+		self.state = 0
+		self.pslot = 0
+		self.cresult = dict()
+		self.slot_client = dict()
+		self.nwr = -1
+		self.ncm = -1
+		self.nch = -1
+		self.ncom_ch=-1
+		self.ngrs = -1
+		self.ncatchup= -1
+		self.idr = idr
+		self.kill= False
+		if str(r.index(idr)) in failure.keys() and len(fail)==0:
+				output(str(failure))
+				for x in failure[str(r.index(idr))]:
+					fail.append(split(r'[(,)]+',x))
+		#logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+"  fail is " + str(fail))
+	def receive(msg =("wedged_req1",),from_=olympus):
+		h= wedged_history
+		h.update(history)
+		send(("wedged_statement1",h),to = olympus)
+	def receive(msg =("wedged_req",),from_=olympus):
+		if state == 1 :
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : wedged req received from olympus")
+			
+			nwr = nwr + 1
+			for x in fail:
+				if x[0].strip() == "wedge_request":
+					if int(x[1]) == nwr :
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : wedged req failure triggered for "+str(nwr)+" msg "+ str(x[2]))
+						if x[2].strip() == "change_operation":
+							co = 1	
+						if x[2].strip() == "change_result":
+							cr =1 
+						if x[2].strip() == "drop_result_stmt":
+							drs=1	
+						if x[2].strip() == "drop":
+							drop=1
+						if x[2].strip() == "truncate_history":
+							truncate_history = 1
+							truncate_history_n = int(x[3])
+						if x[2].strip() == "crash":
+							crash =1 
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+							crash=0
+							logging.shutdown()
+							os._exit(-1)
+						if x[2].strip() == "sleep":
+							sleep=1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+							time.sleep(int(x[3])/1000)
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+							sleep=0
+						if x[2].strip() == "increment_slot":
+							increment_slot=1
+							if r.index(idr) == 0 :
+								slot=slot+1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+							increment_slot=0
+						if x[2].strip() == "extra_op":
+							extra_op=1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+							d['a'] = 'a'
+							extra_op=0
+						if x[2].strip() == "invalid_order_sig":
+							invalid_order_sig=1
+						if x[2].strip() == "invalid_result_sig":
+							invalid_result_sig=1	
+						if x[2].strip() == "drop_checkpt_stmts":
+							drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			state =0
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : state changed to immutable")
+			#if 	crash ==1:
+			#	logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+			#	crash=0
+			#	logging.shutdown()
+			#	os._exit(-1)
+			h= wedged_history
+			h.update(history)
+			if truncate_history == 1 :
+				truncate_history = 0
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Truncating the history by : "+ str(truncate_history_n))
+				keys = []
+				for x in h:
+					keys.append(x)
+				keys=sorted(keys)
+				keys = keys[:len(keys)-truncate_history_n]
+				for x in keys:
+					h.pop(x)
+			send(("wedged_statement",h),to = olympus)
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : wedged statement sent to olympus")
+		else:
+			pass
+	def receive(msg= ("get_running_state",), from_ = olympus):
+		logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Get running state msg received from olympus")
+		ngrs =ngrs+1
+		for x in fail:
+			if x[0].strip() == "get_running_state":
+				if int(x[1]) == ngrs :
+					logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : get_running_state failure triggered for "+str(ngrs)+" msg "+ str(x[2]))
+					if x[2].strip() == "change_operation":
+						co = 1	
+					if x[2].strip() == "change_result":
+						cr =1 
+					if x[2].strip() == "drop_result_stmt":
+						drs=1	
+					if x[2].strip() == "drop":
+						drop=1
+						
+					if x[2].strip() == "crash":
+						crash =1 
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+						crash=0
+						logging.shutdown()
+						os._exit(-1)
+					if x[2].strip() == "truncate_history":
+						truncate_history = 1
+						truncate_history_n = int(x[3])
+							
+					if x[2].strip() == "sleep":
+						sleep=1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+						time.sleep(int(x[3])/1000)
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+						sleep=0
+					if x[2].strip() == "increment_slot":
+						increment_slot=1
+						if r.index(idr) == 0 :
+							slot=slot+1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+						increment_slot=0
+					if x[2].strip() == "extra_op":
+						extra_op=1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+						d['a'] = 'a'
+						extra_op=0
+					if x[2].strip() == "invalid_order_sig":
+						invalid_order_sig=1
+					if x[2].strip() == "invalid_result_sig":
+						invalid_result_sig=1	
+					if x[2].strip() == "drop_checkpt_stmts":
+						drop_checkpt_stmts=1
+		if drop == 1:
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+			drop=0
+			return
+		en_data_dict = repr(d).encode()
+		data_dict_digest =  nacl.hash.sha256(en_data_dict,encoder=nacl.encoding.HexEncoder)
+		data_dict_hash = nacl.encoding.HexEncoder.encode(en_data_dict)
+		send(("get_running_state_res",data_dict_digest,data_dict_hash,cresult),to=olympus)
+		logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : sent running state msg to olympus")
+	def receive(msg =("catch_up_req",catchup),from_=olympus):
+		logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : catch up msg received from olympus")
+		ncatchup = ncatchup + 1
+		for x in fail:
+			if x[0].strip() == "catch_up":
+				if int(x[1]) == ncatchup :
+					logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : catch_up failure triggered for "+str(ncatchup)+" msg "+ str(x[2]))
+					if x[2].strip() == "change_operation":
+						co = 1	
+					if x[2].strip() == "change_result":
+						cr =1 
+					if x[2].strip() == "drop_result_stmt":
+						drs=1	
+					if x[2].strip() == "drop":
+						drop=1
+						
+					if x[2].strip() == "crash":
+						crash =1 
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+						crash=0
+						logging.shutdown()
+						os._exit(-1)
+					if x[2].strip() == "truncate_history":
+						truncate_history = 1
+						truncate_history_n = int(x[3])
+							
+					if x[2].strip() == "sleep":
+						sleep=1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+						time.sleep(int(x[3])/1000)
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+						sleep=0
+					if x[2].strip() == "increment_slot":
+						increment_slot=1
+						if r.index(idr) == 0 :
+							slot=slot+1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+						increment_slot=0
+					if x[2].strip() == "extra_op":
+						extra_op=1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+						d['a'] = 'a'
+						extra_op=0
+					if x[2].strip() == "invalid_order_sig":
+						invalid_order_sig=1
+					if x[2].strip() == "invalid_result_sig":
+						invalid_result_sig=1	
+					if x[2].strip() == "drop_checkpt_stmts":
+						drop_checkpt_stmts=1
+		if drop == 1:
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+			drop=0
+			return
+		output(catchup)
+		d1=d
+		#cresult = dict()
+		for op in catchup:
+			#output(op)
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+"  replica previous history "+ str(history))
+			history[op] = catchup[op]
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+"  replica updated history "+ str(history))
+			operation = catchup[op][0]
+			x= split(r"[,()']+",operation)
+				#output(x)
+			if x[0] == "put":
+				d[x[1]] = x[2]
+				res = "ok"
+			if x[0] == "get" : 
+				try:
+					res=  d[x[1]]
+				except KeyError:
+					res=""
+			if x[0] == "append" :
+				try:
+					d[x[1]] = d[x[1]]+x[2]
+					res="update ok"
+				except KeyError:
+					res="update failed"
+			if x[0] == "slice" :
+				x[2] = x[2].split(":")
+				try:
+					d[x[1]] = d[x[1]][int(x[2][0]):int(x[2][1])]
+					res= "slice ok"
+					#output(d[x[1]])
+				except KeyError:
+					res = "slice fail"
+					#output(res)
+			en_res = res.encode()
+			res_digest =  nacl.hash.sha256(en_res,encoder=nacl.encoding.HexEncoder)
+			res_hash = nacl.encoding.HexEncoder.encode(en_res)	
+			cresult[catchup[op][1]] = [res_digest,res_hash,op,catchup[op][2]]			
+		en_data_dict = repr(d).encode()
+		data_dict_digest =  nacl.hash.sha256(en_data_dict,encoder=nacl.encoding.HexEncoder)
+		data_dict_hash = nacl.encoding.HexEncoder.encode(en_data_dict)
+		logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : sent caught_up_res to olympus " + str(cresult))
+		send(("caught_up_res",data_dict_digest,data_dict_hash,cresult),to=olympus)
+	def receive(msg =("re-trans-client",encrypt_oper,encrypt_rid),from_=client):
+		#output("received")
+		#if rid_slot[rid] in hr.keys():
+		#output(str(idr))
+		#output("dict is "+ repr(rid_slot))
+		#output("rid is "+repr(rid))
+		if state == 1:
+			client_rep_dkey=nacl.signing.VerifyKey(public_key_dict[client], encoder=nacl.encoding.HexEncoder)					
+			try:
+				client_rep_dkey.verify(encrypt_oper)
+				client_rep_dkey.verify(encrypt_rid)
+				operation = encrypt_oper.message.decode()
+				rid = int(encrypt_rid.message.decode())
+			except nacl.exceptions.BadSignatureError :
+				logging.error("Replica "+ str(r.index(idr))+" : Client " + str(c.index(client)) +" -> Replica "+ str(r.index(idr))+ " re-transmission signature failed for rid "+str(rid))
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Client " + str(c.index(client)) +" -> Replica "+ str(r.index(idr))+ " re-transmission signature success for rid "+str(rid))
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Client " + str(c.index(client)) +" -> Replica "+ str(r.index(idr))+ " re-transmission msg received for rid "+str(rid))	
+			try:
+				ncr[c.index(client)] = ncr[c.index(client)] +1
+			except KeyError:
+				ncr[c.index(client)] = 0
+			if r.index(idr) == 5:
+					logging.info("ncr is " + str(ncr) + " fail is "+str(fail) )	
+			for x in fail:
+				if x[0].strip() == "client_request":
+					if int(x[1]) in ncr.keys():
+						if ncr[int(x[1])] == int(x[2]) and int(x[1]) == c.index(client):
+							#output("ncr triggered at head for client "+ str(c.index(client)) + "rid " + str(rid) )
+							logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Client_request failure triggered at replica "+str(r.index(idr))+"  for client "+ x[1] + " message " + x[2])
+							if x[3].strip() == "change_operation":
+								co = 1	
+							if x[3].strip() == "change_result":
+								cr =1 
+							if x[3].strip() == "drop_result_stmt":
+								drs=1	
+							if x[3].strip() == "drop":
+								drop=1
+							if x[3].strip() == "truncate_history":
+								truncate_history = 1
+								truncate_history_n = int(x[4])
+							if x[3].strip() == "crash":
+								crash =1 
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+								crash=0
+								logging.shutdown()
+								os._exit(-1)
+							if x[3].strip() == "sleep":
+								sleep=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+								time.sleep(int(x[4])/1000)
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+								sleep=0
+							if x[3].strip() == "increment_slot":
+								increment_slot=1
+								if r.index(idr) == 0 :
+									slot=slot+1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+								increment_slot=0
+							if x[3].strip() == "extra_op":
+								extra_op=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+								d['a'] = 'a'
+								extra_op=0
+							if x[3].strip() == "invalid_order_sig":
+								invalid_order_sig=1
+							if x[3].strip() == "invalid_result_sig":
+								invalid_result_sig=1	
+							if x[3].strip() == "drop_checkpt_stmts":
+								drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			if (rid,client) in rid_slot.keys() and rid_slot[(rid,client)] in history.keys():
+				#output("rid is "+str(r.index(idr)))
+				#logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" rid_slot " + str(rid_slot))
+				if rid_slot[(rid,client)] in hr.keys():
+					#output("slot is "+str(rid_slot[(rid,client)])+" result is "+ str(result[rid_slot[(rid,client)]])+ "replica is" + str(r.index(idr)) )
+					#output(hr[rid_slot[rid]])
+					#encrypt_hashresult = pk.sign(repr(hr[rid_slot[(rid,client)]]).encode())
+					#encrypt_slot = pk.sign(str(slot).encode())
+					if state == 1:
+						send(("re-trans-replica",hr[rid_slot[(rid,client)]],result[rid_slot[(rid,client)]],rid),to=client)
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Replica " + str(r.index(idr)) +" -> Client "+ str(c.index(client))+ " cached result sent to client for rid "+str(rid))
+						#output("sent to client"+str(result[rid_slot[(rid,client)]]))
+				
+			else:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : else condition enter")
+				if r.index((idr))!=0:
+					encrypt_oper_rep = pk.sign(operation.encode())
+					encrypt_rid = pk.sign(str(rid).encode())
+					logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : before sending to head")
+					send(("forward-req",encrypt_oper_rep,encrypt_oper,encrypt_rid,client),to = r[0])
+					logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Replica " + str(r.index(idr)) +" ->Replica 0 forward request sent for client "+ str(c.index(client))+ " rid "+str(rid))
+					if(await((rid,client) in rid_slot.keys() and rid_slot[(rid,client)] in hr.keys())):
+						send(("re-trans-replica",hr[rid_slot[(rid,client)]],result[rid_slot[(rid,client)]]),to=client)
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Replica " + str(r.index(idr)) +" -> Client "+ str(c.index(client))+ " cached result arrived before timeout and sent to client for rid "+str(rid))
+					elif timeout(replica_timeout):
+						if state == 1:
+							#output("reconfig req to olympus")
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : Replica " + str(r.index(idr)) +" -> Olympus proof of misbehaviour : cached result time out for client "+ str(c.index(client))+ " rid "+str(rid))
+							#output("olympus id is "+ str(olympus))
+							send(("reconfig-request",),to = olympus)
+		else:
+			pass				
+	def receive(msg = ("forward-req",encrypt_oper_rep,encrypt_oper,encrypt_rid,client) , from_=replica):
+		if state == 1:
+			rep_head_dkey=nacl.signing.VerifyKey(public_key_dict[replica], encoder=nacl.encoding.HexEncoder)
+			rep_c_dkey = nacl.signing.VerifyKey(public_key_dict[client], encoder=nacl.encoding.HexEncoder)
+			try:
+				rep_head_dkey.verify(encrypt_oper_rep)
+				rep_c_dkey.verify(encrypt_oper)
+				rep_head_dkey.verify(encrypt_rid)
+				operation = encrypt_oper_rep.message.decode()
+				operation_client = encrypt_oper.message.decode()
+				rid = int(encrypt_rid.message.decode())
+			except nacl.exceptions.BadSignatureError :
+				logging.error("Replica 0 : Replica " + str(r.index(replica)) +" -> Replica 0 forward-req signature failed for rid "+str(rid))
+			logging.info("Configuration "+str(configuration)+" Replica 0 : Replica " + str(r.index(replica)) +" -> Replica 0 forward-req signature success for rid "+str(rid))	
+			logging.info("Configuration "+str(configuration)+" Replica 0 received forwarded request from "+str(r.index(replica))+" by client "+str(c.index(client))+" rid "+str(rid))	
+			try:
+				nfr[c.index(client)] = nfr[c.index(client)] +1
+			except KeyError:
+				nfr[c.index(client)] = 0
+			#logging.info("fail = " + str(fail) + " nfr = "+str(nfr)+"  Client "+ str(c.index(client)) +"  rid "+str(rid))	
+			for x in fail:
+				
+				if x[0].strip() == "forwarded_request":
+					if int(x[1]) in nfr.keys():
+						if nfr[int(x[1])] == int(x[2]) and int(x[1]) == c.index(client):
+							#output("ncr triggered at head for client "+ str(c.index(client)) + "rid " + str(rid) )
+							logging.info("Configuration "+str(configuration)+" Replica 0: Forward_request failure triggered at replica "+str(r.index(idr))+"  for client "+ x[1] + " message " + x[2])
+							if x[3].strip() == "change_operation":
+								co = 1	
+							if x[3].strip() == "change_result":
+								cr =1 
+							if x[3].strip() == "drop_result_stmt":
+								drs=1	
+							if x[3].strip() == "drop":
+								drop=1
+							if x[3].strip() == "truncate_history":
+								truncate_history = 1
+								truncate_history_n = int(x[4])
+							if x[3].strip() == "crash":
+								crash =1 
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+								crash=0
+								logging.shutdown()
+								os._exit(-1)
+							if x[3].strip() == "sleep":
+								sleep=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+								time.sleep(int(x[4])/1000)
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+								sleep=0
+							if x[3].strip() == "increment_slot":
+								increment_slot=1
+								if r.index(idr) == 0 :
+									slot=slot+1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+								increment_slot=0
+							if x[3].strip() == "extra_op":
+								extra_op=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+								d['a'] = 'a'
+								extra_op=0
+							if x[3].strip() == "invalid_order_sig":
+								invalid_order_sig=1
+							if x[3].strip() == "invalid_result_sig":
+								invalid_result_sig=1	
+							if x[3].strip() == "drop_checkpt_stmts":
+								drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			if operation != operation_client:
+				send(("reconfig-request",),to = olympus)
+				logging.info("Configuration "+str(configuration)+" Replica 0 operation mismatch from client")
+			if (rid,client) in rid_slot.keys() and  rid_slot[(rid,client)] in hr.keys():
+				#output("rid is "+str(r.index(idr)))
+				
+					send(("re-trans-replica",hr[rid_slot[(rid,client)]],result[rid_slot[(rid,client)]],rid),to=client)
+					logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 has the result shuttle cached and sent to Client "+ str(c.index(client)) +"  rid "+str(rid))
+			else :
+				if (rid,client) in rid_slot.keys() and rid_slot[(rid,client)] in history.keys():
+					logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 has started timer")
+					if(await((rid,client) in rid_slot.keys() and rid_slot[(rid,client)] in hr.keys())):
+						send(("re-trans-replica",hr[rid_slot[(rid,client)]],result[rid_slot[(rid,client)]]),to=client)
+						logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 has the result shuttle cached before timer expired and sent to Client "+ str(c.index(client)) +"  rid "+str(rid))
+					elif timeout(head_timeout):
+						if state == 1:
+							#output("reconfig req to olympus")
+							logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 timer expired, reconfig request to olympus")
+							output("olympus id is "+ str(olympus))
+							send(("reconfig-request",),to = olympus)
+				else :
+					logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 doesn't have the slot for Client "+ str(c.index(client)) +"  rid "+str(rid))
+					encrypt_oper_rep=pk.sign(operation.encode())
+					encrypt_rid = pk.sign(str(rid).encode())
+					send(("head-retrans-head",encrypt_oper_rep,encrypt_oper,encrypt_rid,client), to = r[0])
+					logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 has sent request for Client "+ str(c.index(client)) +"  rid "+str(rid)+" to Replica0 ")
+					logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 has started the timer")
+					if(await((rid,client) in rid_slot.keys() and rid_slot[(rid,client)] in hr.keys())):	
+						logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 has the result shuttle cached and sent to Client "+ str(c.index(client)) +"  rid "+str(rid))
+						send(("re-trans-replica",hr[rid_slot[(rid,client)]],result[rid_slot[(rid,client)]]),to=client)
+					elif timeout(head_timeout):
+						if state == 1:
+							#output("reconfig req to olympus")
+							logging.info("Configuration "+str(configuration)+" Replica 0: Replica 0 timer expired, reconfig request to olympus")
+							output("olympus id is "+ str(olympus))
+							send(("reconfig-request",),to = olympus)
+		else:
+			pass				
+	def receive(msg= ("head-retrans-head",encrypt_oper_rep,encrypt_oper,encrypt_rid,client), from_ = head):
+		if state == 1:
+			rep_head_dkey=nacl.signing.VerifyKey(public_key_dict[head], encoder=nacl.encoding.HexEncoder)
+			c_head_dkey=nacl.signing.VerifyKey(public_key_dict[client], encoder=nacl.encoding.HexEncoder)
+			try:
+				rep_head_dkey.verify(encrypt_oper_rep)
+				rep_head_dkey.verify(encrypt_rid)
+				c_head_dkey.verify(encrypt_oper)
+				operation = encrypt_oper_rep.message.decode()
+				operation_client = encrypt_oper.message.decode()
+				rid = int(encrypt_rid.message.decode())
+			except nacl.exceptions.BadSignatureError :
+				logging.error("Replica 0 : Replica 0 -> Replica 0 forward-req decryption failed for rid "+str(rid))
+			if operation != operation_client:
+				send(("reconfig-request",),to = olympus)
+				logging.info("Configuration "+str(configuration)+" Replica 0 operation mismatch from client")
+			slot=slot+1
+			if  slot in history.keys():
+				logging.error("replica 0:  client "+ str(c.index(client)) +" -> replica 0 slot error for rid "+ str(rid) + "slot " + str(slot))
+			rid_slot[(rid,client)]=slot	
+			orderproof.append([slot,operation])
+			#logging.info("reached here 1")
+			history[slot] = [operation,c.index(client),rid]
+			#operation = head_client_box.decrypt(encrypt_operation).decode()
+			#output(operation)
+			x= split(r"[,()']+",operation)
+			#output(x)
+			if x[0] == "put":
+				d[x[1]] = x[2]
+				res = "ok"
+			if x[0] == "get" : 
+				try:
+					res=  d[x[1]]
+				except KeyError:
+					res=""
+			if x[0] == "append" :
+				try:
+					d[x[1]] = d[x[1]]+x[2]
+					res="update ok"
+				except KeyError:
+					res="update failed"
+			if x[0] == "slice" :
+				x[2] = x[2].split(":")
+				try:
+					d[x[1]] = d[x[1]][int(x[2][0]):int(x[2][1])]
+					res= "slice ok"
+					#output(d[x[1]])
+				except KeyError:
+					res = "slice fail"
+					#output(res)
+			result[slot] = res		
+			i=r.index(idr)
+			#output("head" + operation)
+			#logging.info("reached here 2")
+			en_res = res.encode()
+			res_digest =  nacl.hash.sha256(en_res,encoder=nacl.encoding.HexEncoder)
+			res_hash = nacl.encoding.HexEncoder.encode(en_res)	
+			hashresult=[[res_digest,res_hash,slot]]
+			cresult[c.index(client)] = [res_digest,res_hash,slot,rid]
+			#output("head")
+			#output(hashresult)
+			#head_r1_box = Box(pk, public_key_dict[r[i+1]])
+			encrypt_operation_rep = pk.sign(operation.encode())
+			encrypt_slot = pk.sign(str(slot).encode())
+			#encrypt_operation = head_r1_box.encrypt(operation.encode())
+			encrypt_hashresult = pk.sign(repr(hashresult).encode())
+			encrypt_order_proof = pk.sign(repr(orderproof).encode())
+			#encrypt_rid_slot = pk.sign(repr(rid_slot).encode())
+			
+			#encrypt_client = pk.sign(str(client).encode())
+			logging.info("Configuration "+str(configuration)+" Replica 0:  replica 0 -> replica "+str(i+1) + " for slot "+ str(slot))
+			send(("rep_trans",encrypt_slot,encrypt_operation_rep,encrypt_oper,encrypt_order_proof,encrypt_hashresult,client,rid_slot,rid), to =r[i+1])
+			#logging.info("reached here 3")
+		else:
+			pass
+	def receive(msg =("initial_transmission",encrypt_operation,encrypt_rid) ,from_=client):
+		#time.sleep(6)
+		logging.info(" overall failure is  "+ str(failure))
+		if state == 1:
+			head_client_dkey=nacl.signing.VerifyKey(public_key_dict[client], encoder=nacl.encoding.HexEncoder)
+			try:
+				head_client_dkey.verify(encrypt_operation)
+				head_client_dkey.verify(encrypt_rid)
+				operation = encrypt_operation.message.decode()
+				rid = int(encrypt_rid.message.decode())
+			except nacl.exceptions.BadSignatureError :
+				#output("client-head decrypt fail")
+				logging.error("replica 0:  client "+ str(c.index(client)) +" -head signature fail for rid "+ str(rid))
+			logging.info("Configuration "+str(configuration)+" Replica 0:  client "+ str(c.index(client)) +" -head signature success for rid "+ str(rid))	
+			idr=r[0]
+			i=r.index(idr)
+			s=s+1
+			try:
+				ncr[c.index(client)] = ncr[c.index(client)] +1
+			except KeyError:
+				ncr[c.index(client)] = 0
+			for x in fail:
+				if x[0].strip() == "client_request":
+					if int(x[1]) in ncr.keys():
+						if ncr[int(x[1])] == int(x[2]) and int(x[1]) == c.index(client):
+							#output("ncr triggered at head for client "+ str(c.index(client)) + "rid " + str(rid) )
+							logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Client_request failure triggered at replica "+str(r.index(idr))+"  for client "+ x[1] + " message " + x[2])
+							if x[3].strip() == "change_operation":
+								co = 1	
+							if x[3].strip() == "change_result":
+								cr =1 
+							if x[3].strip() == "drop_result_stmt":
+								drs=1	
+							if x[3].strip() == "drop":
+								drop=1
+							if x[3].strip() == "truncate_history":
+								truncate_history = 1
+								truncate_history_n = int(x[4])
+							if x[3].strip() == "crash":
+								crash =1 
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+								crash=0
+								logging.shutdown()
+								os._exit(-1)
+							if x[3].strip() == "sleep":
+								sleep=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+								time.sleep(int(x[4])/1000)
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+								sleep=0
+							if x[3].strip() == "increment_slot":
+								increment_slot=1
+								if r.index(idr) == 0 :
+									slot=slot+1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+								increment_slot=0
+							if x[3].strip() == "extra_op":
+								extra_op=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+								d['a'] = 'a'
+								extra_op=0
+							if x[3].strip() == "invalid_order_sig":
+								invalid_order_sig=1
+							if x[3].strip() == "invalid_result_sig":
+								invalid_result_sig=1	
+							if x[3].strip() == "drop_checkpt_stmts":
+								drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			
+			if (slot)%(checkpoint)== 0 and slot!=0:
+				logging.info("Configuration "+str(configuration)+" Replica 0: checkpoint occured for slot "+str(slot-1)) 
+				temp_d = d.copy()
+				logging.info(str(slot) + " , " + str(temp_d))
+				en_data_dict = repr(temp_d).encode()
+				data_dict_digest =  nacl.hash.sha256(en_data_dict,encoder=nacl.encoding.HexEncoder)
+				data_dict_hash = nacl.encoding.HexEncoder.encode(en_data_dict)	
+				checkpoint_proof=[[data_dict_digest,data_dict_hash,slot-1]]
+				encrypt_checkpoint_proof = pk.sign(repr(checkpoint_proof).encode())
+				send(("forward_chekpoint_proof",encrypt_checkpoint_proof), to =r[i+1])
+				logging.info("Configuration "+str(configuration)+" Replica 0:  replica 0 -> replica "+str(i+1) + " checkpoint proof sent for slot "+ str(slot-1))
+				#time.sleep(0.3)
+
+			slot=slot+1
+			if  slot in history.keys():
+				logging.error("replica 0:  client "+ str(c.index(client)) +" -> replica 0 slot error for rid "+ str(rid) + "slot " + str(slot))
+			if len(history) > 0:	
+				pslot = max(history.keys())
+			else:
+				pslot=-1
+			if slot-1 != pslot :
+				send(("reconfig-request",),to = olympus)
+				logging.error("replica "+ str(i+1) +":  client "+ str(c.index(client)) +" -> replica "+str(i+1)+" slot error " + str(slot))		
+
+			#if str(r.index(idr)) in failure.keys() and len(fail)==0:
+			#	for x in failure[str(r.index(idr))]:
+			#		fail.append(split(r'[(,)]+',x))
+			#logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+"  fail is " + str(fail))			
+			
+			#output(ncr)
+			#output(fail)
+			
+			#head_client_box = Box(pk, public_key_dict[client])
+			
+			orderproof=[]
+			#hashresult = dict()
+			
+					
+			#output(str(r.index(idr))+str(fail))	
+				
+			
+			rid_slot[(rid,client)]=slot	
+			orderproof.append([slot,operation])
+			history[slot] = [operation,c.index(client),rid]
+			#slot_client[slot] = c.index(client)
+			#operation = head_client_box.decrypt(encrypt_operation).decode()
+			#output(operation)
+			x= split(r"[,()']+",operation)
+			#output(x)
+			if x[0] == "put":
+				d[x[1]] = x[2]
+				res = "ok"
+			if x[0] == "get" : 
+				try:
+					res=  d[x[1]]
+				except KeyError:
+					res=""
+			if x[0] == "append" :
+				try:
+					d[x[1]] = d[x[1]]+x[2]
+					res="update ok"
+				except KeyError:
+					res="update failed"
+			if x[0] == "slice" :
+				x[2] = x[2].split(":")
+				try:
+					d[x[1]] = d[x[1]][int(x[2][0]):int(x[2][1])]
+					res= "slice ok"
+					#output(d[x[1]])
+				except KeyError:
+					res = "slice fail"
+					#output(res)
+			if co==1:
+				operation = "get('x')"
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Operation changed to get('x') at replica "+str(r.index(idr)))
+				co=0
+			if 	cr ==1 :
+				res = "OK"
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Result changed to 'OK' at replica "+str(r.index(idr)))
+				cr=0
+			result[slot] = res		
+			
+			#output("head" + operation)
+			en_res = res.encode()
+			res_digest =  nacl.hash.sha256(en_res,encoder=nacl.encoding.HexEncoder)
+			res_hash = nacl.encoding.HexEncoder.encode(en_res)	
+			hashresult=[[res_digest,res_hash,slot]]
+			cresult[c.index(client)] = [res_digest,res_hash,slot,rid]
+			if drs == 1:
+				del hashresult[0]
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" :Hashresult of head is omitted at replica "+str(r.index(idr)))
+				drs=0
+			#output("head")
+			#output(hashresult)
+			#head_r1_box = Box(pk, public_key_dict[r[i+1]])
+			encrypt_operation_rep = pk.sign(operation.encode())
+			encrypt_slot = pk.sign(str(slot).encode())
+			#encrypt_operation = head_r1_box.encrypt(operation.encode())
+			encrypt_hashresult = pk.sign(repr(hashresult).encode())
+			encrypt_order_proof = pk.sign(repr(orderproof).encode())
+			#encrypt_rid_slot = pk.sign(repr(rid_slot).encode())			
+			#encrypt_client = pk.sign(str(client).encode())
+			if invalid_order_sig == 1:
+				invalid_order_sig = 0
+				signedlist = list(encrypt_order_proof)
+				signedlist[0] = (signedlist[0] + 1) % 256
+				newsigned=bytes(signedlist)
+				encrypt_order_proof = nacl.signing.SignedMessage._from_parts(encrypt_order_proof._signature, encrypt_order_proof._message, newsigned)
+			if invalid_result_sig == 1:
+				invalid_result_sig = 0
+				signedlist = list(encrypt_hashresult)
+				signedlist[0] = (signedlist[0] + 1) % 256
+				newsigned=bytes(signedlist)
+				encrypt_hashresult = nacl.signing.SignedMessage._from_parts(encrypt_hashresult._signature, encrypt_hashresult._message, newsigned)	
+			if drop==0:
+				logging.info("Configuration "+str(configuration)+" Replica 0:  replica 0 -> replica "+str(i+1) + " for slot "+ str(slot))
+				send(("rep_trans",encrypt_slot,encrypt_operation_rep,encrypt_operation,encrypt_order_proof,encrypt_hashresult,client,rid_slot,rid), to =r[i+1])
+			else:
+				drop = 0
+				logging.info("shuttle dropped by head for client "+str(c.index(client))+" rid "+str(rid))
+			#output("sent from head ")
+		else:
+			pass
+	def receive(msg= ("result-shuttle",encrypt_hashresult,client),from_= frep):
+		if state == 1:
+			try:
+				nrs[c.index(client)] = nrs[c.index(client)] +1
+			except KeyError:
+				nrs[c.index(client)] = 0
+			for x in fail:
+				if x[0].strip() == "result_shuttle":
+					if int(x[1]) in nrs.keys():
+						if nrs[int(x[1])] == int(x[2]) and int(x[1]) == c.index(client):
+							#output("ncr triggered at head for client "+ str(c.index(client)) + "rid " + str(rid) )
+							logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Result_shuttle failure triggered at replica "+str(r.index(idr))+"  for client "+ x[1] + " message " + x[2])
+							if x[3].strip() == "change_operation":
+								co = 1	
+							if x[3].strip() == "change_result":
+								cr =1 
+							if x[3].strip() == "drop_result_stmt":
+								drs=1	
+							if x[3].strip() == "drop":
+								drop=1
+							if x[3].strip() == "truncate_history":
+								truncate_history = 1
+								truncate_history_n = int(x[4])
+							if x[3].strip() == "crash":
+								crash =1 
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+								crash=0
+								logging.shutdown()
+								os._exit(-1)
+							if x[3].strip() == "sleep":
+								sleep=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+								time.sleep(int(x[4])/1000)
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+								sleep=0
+							if x[3].strip() == "increment_slot":
+								increment_slot=1
+								if r.index(idr) == 0 :
+									slot=slot+1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+								increment_slot=0
+							if x[3].strip() == "extra_op":
+								extra_op=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+								d['a'] = 'a'
+								extra_op=0
+							if x[3].strip() == "invalid_order_sig":
+								invalid_order_sig=1
+							if x[3].strip() == "invalid_result_sig":
+								invalid_result_sig=1	
+							if x[3].strip() == "drop_checkpt_stmts":
+								drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			s=s+1
+			#fr_r_box = Box(pk, public_key_dict[frep])
+			fr_r_dkey=nacl.signing.VerifyKey(public_key_dict[frep], encoder=nacl.encoding.HexEncoder)
+			try:
+				fr_r_dkey.verify(encrypt_hashresult)
+				#fr_r_dkey.verify(encrypt_client)
+				temp_hr = eval(encrypt_hashresult.message.decode())
+				#client = encrypt_client.decode()
+			except nacl.exceptions.BadSignatureError :
+				#output("fr-r decrypt fail")
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" : Replica "+str(r.index(frep))+" -> Replica "+str(r.index(idr))+" signature fail")
+			logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" : Replica "+str(r.index(frep))+" -> Replica "+str(r.index(idr))+" signature success") 
+			#hr= eval(fr_r_box.decrypt(encrypt_hashresult).decode())
+			for h in temp_hr:
+				bres=nacl.encoding.HexEncoder.decode(h[1])
+				#output(bres)
+				orig_dgs = nacl.hash.sha256(bres, encoder=nacl.encoding.HexEncoder)
+				if sodium_memcmp(h[0],orig_dgs):
+					if bres.decode()!= result[h[2]]:
+						#output("proof of misbehaviour : result - shuttle"+ ":"+bres.decode()+ ":"+ res)
+						logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Proof of misbehaviour : Reshult_shuttle check failed")
+						
+			hr[h[2]] = temp_hr
+			#output("cached ")#+ repr(hr) + "rid_slot is " + repr(rid_slot))
+			logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Reshult_shuttle cached for slot "+ str(h[2]))
+			j=r.index(frep)
+			if j-2 >= 0  :
+				#r_pr_box = Box(pk, public_key_dict[r[j-2]])
+				
+				encrypt_hashresult = pk.sign(repr(temp_hr).encode())
+				send(("result-shuttle",encrypt_hashresult,client), to =r[j-2])
+				#output("sent")
+			if j-2 < 0:
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Reshult_shuttle reached head")
+				#output("result-shuttle reached head")
+		else:
+			pass	
+			
+	def receive(msg =("forward_chekpoint_proof",encrypt_checkpoint_proof), from_=prev_rep):
+		if state == 1:
+			ncm = ncm +1
+			i=r.index(prev_rep)
+			idr=r[i+1]
+			for x in fail:
+				if x[0].strip() == "checkpoint":
+					if int(x[1]) == ncm :
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : checkpoint failure triggered for "+str(ncm)+" msg "+ str(x[2]))
+						if x[2].strip() == "change_operation":
+							co = 1	
+						if x[2].strip() == "change_result":
+							cr =1 
+						if x[2].strip() == "drop_result_stmt":
+							drs=1	
+						if x[2].strip() == "drop":
+							drop=1
+							
+						if x[2].strip() == "crash":
+							crash =1 
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+							crash=0
+							logging.shutdown()
+							os._exit(-1)
+						if x[2].strip() == "truncate_history":
+							truncate_history = 1
+							truncate_history_n = int(x[3])
+							
+						if x[2].strip() == "sleep":
+							sleep=1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+							time.sleep(int(x[3])/1000)
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+							sleep=0
+						if x[2].strip() == "increment_slot":
+							increment_slot=1
+							if r.index(idr) == 0 :
+								slot=slot+1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+							increment_slot=0
+						if x[2].strip() == "extra_op":
+							extra_op=1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+							d['a'] = 'a'
+							extra_op=0
+						if x[2].strip() == "invalid_order_sig":
+							invalid_order_sig=1
+						if x[2].strip() == "invalid_result_sig":
+							invalid_result_sig=1	
+						if x[2].strip() == "drop_checkpt_stmts":
+							drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			
+			fcp_dkey=nacl.signing.VerifyKey(public_key_dict[prev_rep], encoder=nacl.encoding.HexEncoder)
+			try:
+				fcp_dkey.verify(encrypt_checkpoint_proof)
+			except nacl.exceptions.BadSignatureError :
+				#output("pr-r decrypt fail")
+				logging.error("replica "+ str(i+1) +": replica "+ str(i) +" -> replica "+ str(i+1) +"signature fail ")
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(i+1) +": replica "+ str(i) +" -> replica "+ str(i+1) +"signature success ")	
+			await((slot)%(checkpoint)== 0 and slot!=0)
+			checkpoint_proof_list = eval(encrypt_checkpoint_proof.message.decode())
+			temp_d = d.copy()
+			logging.info("After fws ckp " + str(slot) + " , " + str(temp_d))
+			en_data_dict = repr(temp_d).encode()
+			data_dict_digest =  nacl.hash.sha256(en_data_dict,encoder=nacl.encoding.HexEncoder)
+			data_dict_hash = nacl.encoding.HexEncoder.encode(en_data_dict)	
+			checkpoint_proof=[data_dict_digest,data_dict_hash,slot-1]
+			logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" checkpoint proof added for slot: "+str(slot))
+			checkpoint_proof_list.append(checkpoint_proof)
+			encrypt_checkpoint_proof_list = pk.sign(repr(checkpoint_proof_list).encode())
+			if i+2 < len(r):
+				send(("forward_chekpoint_proof",encrypt_checkpoint_proof_list), to =r[i+2])
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" checkpoint proof sent to replica: "+str(i+2))
+			else:
+				for cp in checkpoint_proof_list:
+					bcp=nacl.encoding.HexEncoder.decode(cp[1])
+					#logging.info("error is "+str(bcp))
+					orig_dgs = nacl.hash.sha256(bcp, encoder=nacl.encoding.HexEncoder)
+					if sodium_memcmp(cp[0],orig_dgs):
+						if eval(bcp.decode())!= temp_d:
+							logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Proof of misbehaviour : data _dict didn't match")
+				len_wh = len(wedged_history)
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" history = "+str(history)+" slot upto to be del "+str(cp[2]) +" wedged hist "+str(wedged_history))
+				for x in range(len_wh,cp[2]):
+					wedged_history[x]=history[x]
+					history.pop(x)
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" History Truncated "+str(history))
+				send(("reverse_chekpoint_proof",encrypt_checkpoint_proof_list), to =prev_rep)					
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Completed checkpoint proof sent to replica: "+str(i))
+		else:
+			pass						
+						
+			
+			
+	def receive(msg =("reverse_chekpoint_proof",encrypt_checkpoint_proof), from_ =frep):
+		if state == 1:
+			ncom_ch = ncom_ch +1 
+			i=r.index(idr)+1
+			#idr=r[i-1]
+			#output(str(fail) + " " + str(r.index(idr)))
+			for x in fail:
+				output(str(x)+ " " + str(r.index(idr)))
+				if x[0].strip() == "completed_checkpoint":
+					if int(x[1]) == ncom_ch:
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : completed_checkpoint failure triggered for "+str(ncom_ch)+" msg "+ str(x[2]))
+						if x[2].strip() == "change_operation":
+							co = 1	
+						if x[2].strip() == "change_result":
+							cr =1 
+						if x[2].strip() == "drop_result_stmt":
+							drs=1	
+						if x[2].strip() == "drop":
+							drop=1
+							
+						if x[2].strip() == "crash":
+							crash =1 
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+							crash=0
+							logging.shutdown()
+							os._exit(-1)
+						if x[2].strip() == "truncate_history":
+							truncate_history = 1
+							truncate_history_n = int(x[3])
+							
+						if x[2].strip() == "sleep":
+							sleep=1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+							time.sleep(int(x[3])/1000)
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+							sleep=0
+						if x[2].strip() == "increment_slot":
+							increment_slot=1
+							if r.index(idr) == 0 :
+								slot=slot+1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+							increment_slot=0
+						if x[2].strip() == "extra_op":
+							extra_op=1
+							logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+							d['a'] = 'a'
+							extra_op=0
+						if x[2].strip() == "invalid_order_sig":
+							invalid_order_sig=1
+						if x[2].strip() == "invalid_result_sig":
+							invalid_result_sig=1	
+						if x[2].strip() == "drop_checkpt_stmts":
+							drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return
+			rcp_dkey=nacl.signing.VerifyKey(public_key_dict[frep], encoder=nacl.encoding.HexEncoder)
+			try:
+				rcp_dkey.verify(encrypt_checkpoint_proof)
+			except nacl.exceptions.BadSignatureError :
+				#output("pr-r decrypt fail")
+				logging.error("replica "+ str(i-1) +": replica "+ str(i) +" -> replica "+ str(i-1) +"signature fail ")
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(i-1) +": replica "+ str(i) +" -> replica "+ str(i-1) +"signature success ")	
+			checkpoint_proof_list = eval(encrypt_checkpoint_proof.message.decode())
+			output("checkpoint_proof_list " + str(len(checkpoint_proof_list))+ "  r " + str(len(r)))
+			if len(checkpoint_proof_list) != len(r):
+				logging.info("Proof of misbehaviour for drop_checkpt_stmts")
+				send(("reconfig-request",),to = olympus)
+			for cp in checkpoint_proof_list:
+				bcp=nacl.encoding.HexEncoder.decode(cp[1])
+				#output(bres)
+				orig_dgs = nacl.hash.sha256(bcp, encoder=nacl.encoding.HexEncoder)
+				if sodium_memcmp(cp[0],orig_dgs):
+					if eval(bcp.decode())!= temp_d:
+						logging.info(str(eval(bcp.decode())) + " , " + str(temp_d))
+						logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Proof of misbehaviour : data _dict didn't match")
+			len_wh = len(wedged_history)
+			logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" history = "+str(history)+" slot upto to be del "+str(cp[2]) +" wedged hist "+str(wedged_history))
+			for x in range(len_wh,cp[2]):
+				wedged_history[x]=history[x]
+				history.pop(x)
+			logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" History Truncated "+str(history))	
+			if drop_checkpt_stmts == 1:
+				drop_checkpt_stmts == 0
+				checkpoint_proof_list = checkpoint_proof_list[int((len(r)+3)/2):]
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Drop checkpoint statements executed")
+			encrypt_checkpoint_proof_list = pk.sign(repr(checkpoint_proof_list).encode())
+			if i-2>=0:		
+				send(("reverse_chekpoint_proof",encrypt_checkpoint_proof_list), to =r[i-2])
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Completed Check point proof sent to replica: "+str(i-2))
+			else:
+				logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Completed Check point proof reached head")
+		else:
+			pass
+	def receive(msg =("rep_trans",encrypt_slot,encrypt_operation_rep,encrypt_operation,encrypt_order_proof,encrypt_hashresult,client,rid_slot,rid) ,from_=prev_rep):
+		
+		if state == 1:
+			s=s+1
+			i=r.index(prev_rep)
+			idr=r[i+1]
+			#if str(r.index(idr)) in failure.keys() and len(fail)==0:
+			#	for x in failure[str(r.index(idr))]:
+			#		fail.append(split(r'[(,)]+',x))
+			#logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+"  fail is " + str(fail))		
+			try:
+				ns[c.index(client)] = ns[c.index(client)] +1
+			except KeyError:
+				ns[c.index(client)] = 0
+				
+			for x in fail:
+				if x[0].strip() == "shuttle":
+					if int(x[1]) in ns.keys():
+						if ns[int(x[1])] == int(x[2]) and int(x[1]) == c.index(client):
+							#output("ncr triggered at head for client "+ str(c.index(client)) + "rid " + str(rid) )
+							logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Shuttle failure triggered at replica "+str(r.index(idr))+"  for client "+ x[1] + " message " + x[2])
+							if x[3].strip() == "change_operation":
+								co = 1	
+							if x[3].strip() == "change_result":
+								cr =1 
+							if x[3].strip() == "drop_result_stmt":
+								drs=1	
+							if x[3].strip() == "drop":
+								drop=1
+							if x[3].strip() == "truncate_history":
+								truncate_history = 1
+								truncate_history_n = int(x[4])
+							if x[3].strip() == "crash":
+								crash =1 
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+								crash=0
+								logging.shutdown()
+								os._exit(-1)
+							if x[3].strip() == "sleep":
+								sleep=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+								time.sleep(int(x[4])/1000)
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+								sleep=0
+							if x[3].strip() == "increment_slot":
+								increment_slot=1
+								if r.index(idr) == 0 :
+									slot=slot+1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+								increment_slot=0
+							if x[3].strip() == "extra_op":
+								extra_op=1
+								logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+								d['a'] = 'a'
+								extra_op=0
+							if x[3].strip() == "invalid_order_sig":
+								invalid_order_sig=1
+							if x[3].strip() == "invalid_result_sig":
+								invalid_result_sig=1	
+							if x[3].strip() == "drop_checkpt_stmts":
+								drop_checkpt_stmts=1
+			if drop == 1:
+				logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+				drop=0
+				return	
+			#output(str(r.index(idr))+str(fail))
+			#result = result+","
+			#output("received _ from head")
+			#pr_r_box = Box(pk, public_key_dict[prev_rep])
+			pr_r_dkey=nacl.signing.VerifyKey(public_key_dict[prev_rep], encoder=nacl.encoding.HexEncoder)
+			c_r_dkey =nacl.signing.VerifyKey(public_key_dict[client], encoder=nacl.encoding.HexEncoder)
+			try:
+				c_r_dkey.verify(encrypt_operation)
+				pr_r_dkey.verify(encrypt_operation_rep)
+				pr_r_dkey.verify(encrypt_hashresult)
+				pr_r_dkey.verify(encrypt_order_proof)
+				pr_r_dkey.verify(encrypt_slot)
+				#pr_r_dkey.verify(encrypt_rid_slot)
+			except nacl.exceptions.BadSignatureError :
+				#output("pr-r decrypt fail")
+				send(("reconfig-request",),to = olympus)
+				logging.error("replica "+ str(i+1) +": replica "+ str(i) +" -> replica "+ str(i+1) +"signature fail ")
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(i+1) +": replica "+ str(i) +" -> replica "+ str(i+1) +"signature success ")	
+			slot = int(encrypt_slot.message.decode())
+			operation = encrypt_operation_rep.message.decode()
+			operation_client = encrypt_operation.message.decode()
+			if operation != operation_client:
+				send(("reconfig-request",),to = olympus)
+				logging.error("replica "+ str(i+1) +": replica "+ str(i) +" -> replica "+ str(i+1) +"operation mismatch with client req ")
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(i+1)+ ": shuttle from replica "+ str(i) +" -> replica "+ str(i+1) +" is received for slot "+ str(slot))
+			hashresult = eval(encrypt_hashresult.message.decode())
+			orderproof = eval(encrypt_order_proof.message.decode())
+			#rid_slot = eval(encrypt_rid_slot.message.decode())
+			#operation = pr_r_box.decrypt(encrypt_operation).decode()
+			#hashresult = eval(pr_r_box.decrypt(encrypt_hashresult).decode())
+			#if slot in history.keys():
+			#	output("slot error")
+			#output(hashresult)
+			if slot in history.keys() :
+				send(("reconfig-request",),to = olympus)
+				logging.error("replica "+ str(i+1) +":  client "+ str(c.index(client)) +" -> replica "+str(i+1)+" slot error " + str(slot))
+			if len(history) > 0:	
+				pslot = max(history.keys())
+			else:
+				pslot=-1
+			if slot-1 != pslot :
+				send(("reconfig-request",),to = olympus)
+				logging.error("replica "+ str(i+1) +":  client "+ str(c.index(client)) +" -> replica "+str(i+1)+" slot error " + str(slot))
+			else:	
+				orderproof.append([slot,operation])
+				history[slot]=[operation,c.index(client),rid]
+				#output("history updated")
+				self.rid_slot = rid_slot
+				x= split(r"[,()']+",operation)
+				#output("replica")
+				#output(hashresult)
+				if x[0] == "put":
+					d[x[1]] = x[2]
+					res = "ok"
+				if x[0] == "get" : 
+					try:
+						res=  d[x[1]]
+					except KeyError:
+						res=  ""
+				if x[0] == "append" :
+					try:
+						d[x[1]]=d[x[1]] + x[2]
+						res= "update ok"
+					except KeyError:
+						res=  "update failed"
+				if x[0] == "slice" :
+					x[2] = x[2].split(":")
+					try:
+						#output("before slice replica")
+						d[x[1]] = d[x[1]][int(x[2][0]):int(x[2][1])]
+						#output("sliced")
+						res= "slice ok"
+					except KeyError:
+						#output("error in slice")
+						res = "slice fail"
+				if co==1:
+					operation = "get('x')"
+					logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Operation changed to get('x') at replica "+str(r.index(idr)))
+					co=0
+				if 	cr ==1 :
+					res = "OK"
+					logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" Result changed to 'OK' at replica "+str(r.index(idr)))
+					cr=0		
+				result[slot] = res
+				en_res = res.encode()
+				res_digest =  nacl.hash.sha256(en_res,encoder=nacl.encoding.HexEncoder)
+				res_hash = nacl.encoding.HexEncoder.encode(en_res)
+				if drs == 1:
+					del hashresult[0]
+					logging.info("Configuration "+str(configuration)+" Replica "+str(r.index(idr))+" :Result shuttle of head is omitted  at replica "+str(r.index(idr)))
+					drs=0
+				hashresult.append([res_digest,res_hash,slot])
+				cresult[c.index(client)] = [res_digest,res_hash,slot,rid]
+				#result = result + res		
+				
+				if i+2 < len(r):
+					#r_nr_box = Box(pk, public_key_dict[r[i+2]])
+					encrypt_operation_rep = pk.sign(operation.encode())
+					encrypt_slot = pk.sign(str(slot).encode())
+					encrypt_hashresult = pk.sign(repr(hashresult).encode())
+					encrypt_order_proof = pk.sign(repr(orderproof).encode())
+					#encrypt_rid_slot = pk.sign(repr(rid_slot).encode())
+					#output(" before r[i+2]")
+					if invalid_order_sig == 1:
+						invalid_order_sig = 0
+						signedlist = list(encrypt_order_proof)
+						signedlist[0] = (signedlist[0] + 1) % 256
+						newsigned=bytes(signedlist)
+						encrypt_order_proof = nacl.signing.SignedMessage._from_parts(encrypt_order_proof._signature, encrypt_order_proof._message, newsigned)
+					if invalid_result_sig == 1:
+						invalid_result_sig = 0
+						signedlist = list(encrypt_hashresult)
+						signedlist[0] = (signedlist[0] + 1) % 256
+						newsigned=bytes(signedlist)
+						encrypt_hashresult = nacl.signing.SignedMessage._from_parts(encrypt_hashresult._signature, encrypt_hashresult._message, newsigned)	
+					if drop == 0 :
+						send(("rep_trans",encrypt_slot,encrypt_operation_rep,encrypt_operation,encrypt_order_proof,encrypt_hashresult,client,rid_slot,rid), to =r[i+2])
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(i+1) +": shuttle from replica "+ str(i+1) +" -> replica "+ str(i+2) +" is sent for slot "+ str(slot))
+					else:
+						drop = 0
+					#output("sent to rep-1 to rep+1")
+				else:
+					#t_c_box = Box(pk, public_key_dict[c[0]])
+					#for so in orderproof :
+					#	if orderproof[0][0]!=so[0] or orderproof[0][1]!=so[1]:
+					#		output("tail - error in orderproof")
+					#output("tail")
+					#output(orderproof)
+					hr[hashresult[0][2]] = hashresult
+					encrypt_res = pk.sign(en_res)
+					encrypt_hashresult = pk.sign(repr(hashresult).encode())
+					encrypt_hashresult_shuttle = pk.sign(repr(hashresult).encode())
+					send(("result-shuttle" , encrypt_hashresult_shuttle,client), to=prev_rep)
+					logging.info("Configuration "+str(configuration)+" Replica "+ str(i+1) +": result shuttle  from tail  -> replica "+ str(r.index(idr)-1) +" is sent for slot "+ str(slot))
+					#time.sleep(3.25)
+					if invalid_result_sig == 1:
+						invalid_result_sig = 0
+						signedlist = list(encrypt_hashresult)
+						signedlist[0] = (signedlist[0] + 1) % 256
+						newsigned=bytes(signedlist)
+						encrypt_hashresult = nacl.signing.SignedMessage._from_parts(encrypt_hashresult._signature, encrypt_hashresult._message, newsigned)
+					if drop ==0 :
+						send(("result",encrypt_hashresult,encrypt_res,rid), to = client)
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(i+1) +": result from tail  -> client "+ str(c.index(client)) +" is sent for slot "+ str(slot))
+					else:
+						drop =0 
+					#output("tail : sent to client")
+					#t_pr_box = Box(pk, public_key_dict[r[i]])
+					
+					#encrypt_client = pk.sign(str(client).encode())
+					#output("tail : before sending to prev _rep")
+					
+					
+					#output("tail : sent to prev rep")
+		else:
+			pass	
+	def receive(msg=("kill",),from_=olympus):
+		logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr)) +": killed")
+		kill = True
+	def receive(msg=("active",),from_=olympus):
+		logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr)) +": new config from olympus")
+		for x in fail:
+			if x[0].strip() == "new_configuration":
+				if int(x[1]) == configuration -1 :
+					logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : new_configuration failure triggered ")
+					if x[2].strip() == "change_operation":
+						co = 1	
+					if x[2].strip() == "change_result":
+						cr =1 
+					if x[2].strip() == "drop_result_stmt":
+						drs=1	
+					if x[2].strip() == "drop":
+						drop=1
+					if x[2].strip() == "truncate_history":
+						truncate_history = 1
+						truncate_history_n = int(x[3])
+					if x[2].strip() == "crash":
+						crash =1 
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : implementing crash failure now..replica exiting..")
+						crash=0
+						logging.shutdown()
+						os._exit(-1)
+					if x[2].strip() == "sleep":
+						sleep=1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" sleeping")
+						time.sleep(int(x[3])/1000)
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" woke up ")
+						sleep=0
+					if x[2].strip() == "increment_slot":
+						increment_slot=1
+						if r.index(idr) == 0 :
+							slot=slot+1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" slot number incremented from "+str(slot-1)+" to "+str(slot))
+						increment_slot=0
+					if x[2].strip() == "extra_op":
+						extra_op=1
+						logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" put(a,a) performed and applied to running state")
+						d['a'] = 'a'
+						extra_op=0
+					if x[2].strip() == "invalid_order_sig":
+						invalid_order_sig=1
+					if x[2].strip() == "invalid_result_sig":
+						invalid_result_sig=1	
+					if x[2].strip() == "drop_checkpt_stmts":
+						drop_checkpt_stmts=1
+		if drop == 1:
+			logging.info("Configuration "+str(configuration)+" Replica "+ str(r.index(idr))+" : drop (ignoring) the incoing msg")
+			drop=0
+			return
+		logging.info("Configuration "+str(configuration)+" Replica change state to active")	
+		state = 1
+	def run():
+		logging.basicConfig(format='%(asctime)s : %(message)s',level = logging.INFO, filename=sys.argv[-1][0:-4]+'_replica_log.log')
+		
+		await(kill)		

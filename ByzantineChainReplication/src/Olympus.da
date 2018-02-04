@@ -1,0 +1,291 @@
+import sys
+import nacl.encoding
+import nacl.hash
+import nacl.signing
+import itertools
+from nacl.bindings.utils import sodium_memcmp
+from re import split
+import time
+import logging
+Replica = import_da('Replica')
+class Olympus(process):
+	def setup(config : dict,c :list,r:list,parent : list,olympus : list, num_replica : int):
+		self.config = config
+		self.failure = dict()
+		self.count =0
+		self.history = dict()
+		self.count1 =0
+		self.data_dict = dict()
+		self.catchup = dict()
+		self.lh = dict()
+		self.lhr = 0
+		self.flag = False
+		self.client_rs = dict()
+		self.public_key_dict=dict()
+		self.private_key_dict = dict()
+		self.a = False
+		self.head_timeout = 0
+		self.nonhead_timeout = 0
+		self.client_timeout = 0
+		self.configuration = 0
+		self.match_t1= True
+		self.grs= 2
+		self.combr= []
+		self.comb_t1= []
+		self.checkpoint = 0
+		self.client_rs = dict()
+	def check_consistency(comb,history,r):
+		rep_pair = itertools.combinations(comb, 2)
+		for x in rep_pair:
+			for h in history[r.index(x[0])]:
+				if h in history[r.index(x[1])].keys():
+					if history[r.index(x[1])][h] !=  history[r.index(x[0])][h]:
+						return False
+		return True				
+	def longest_history(comb,history,r):
+		max_len=0
+		l=0
+		lh=dict()
+		
+		lhr = r.index(comb[0])
+		for x in comb:
+			#output(history)
+			#output(len(history[r.index(x)]))
+			l = len(history[r.index(x)])
+			if l>max_len:
+				max_len = l
+				lhr = r.index(x)
+				lh=history[r.index(x)]
+		return lh
+	def update_history():
+		send(("wedged_req1",),to = r)
+	def receive(msg=("wedged_statement1",h),from_=rep):
+		#logging.info("Configuration "+str(configuration)+" Olympus received wedged statement from replica  "+ str(r.index(rep)) +" with history " + str(h))
+		history[r.index(rep)] = h	
+		combr.append(rep)
+		logging.info("replica  "+ str(r.index(rep)) +" with history " + str(h))
+	def receive(msg=("wedged_statement",h),from_=rep):
+		logging.info("Configuration "+str(configuration)+" Olympus received wedged statement from replica  "+ str(r.index(rep)) +" with history " + str(h))
+		count = count +1
+		enter = int((len(r)-1)/2) + 1
+		history[r.index(rep)] = h
+		combr.append(rep) #srujan
+		if count > int((len(r)-1)/2):
+			enter=0
+			count=0
+			logging.info("Configuration "+str(configuration)+" Olympus :enter history is "+str(history))
+			#output(history)
+			len_t1 = int((len(r)-1)/2) + 1
+			#output("length is "+str(len_t1))
+			if await(count == len(r)):
+				comb_t1 = list(itertools.combinations(combr, len_t1))
+			elif timeout(1):
+				comb_t1 = list(itertools.combinations(combr, len_t1))
+			#output(list(comb_t1))
+			for comb in comb_t1:
+				output("new comb taken")
+				update_history()
+				#time.sleep(0.5)
+				flag=False
+				match_t1= True
+				#output("comb is "+str(comb))
+				if check_consistency(comb,history,r):
+					output("check_consistency passed")
+					lh  = longest_history(comb,history,r)
+					logging.info("Configuration "+str(configuration)+" Olympus :lh calculated ")
+					logging.info("Configuration "+str(configuration)+"longest history of comb "+str(comb)+" is "+str(lh))
+					for replica in comb:
+						catchup = dict()
+						#logging.info("history of replica "+ str(r.index(replica))+" is "+ str(history[r.index(replica)]) )
+						for x in lh:
+							if x not in history[r.index(replica)].keys():
+								catchup[x] = lh[x]
+						#catchup = { k : lh[k] for k in set(lh) - set(history[r.index(replica)])}
+						logging.info("catchup of replica "+ str(r.index(replica))+ "is "+str(catchup))
+						send(("catch_up_req",catchup),to= replica)
+						logging.info("Configuration "+str(configuration)+" Olympus sent catch up msg  "+ str(r.index(replica)))
+				else:
+					flag = True
+				await(flag)
+	def receive(msg=("caught_up_res",data_dict_digest,data_dict_hash,cresult),from_=rep):
+		#logging.info( str(rep) + "   " + str(r))
+		logging.info("Configuration "+str(configuration)+" Olympus received caught_up_res from replica  "+ str(r.index(rep)))
+		
+		count1 = count1 +1
+		b_data_dict_hash=nacl.encoding.HexEncoder.decode(data_dict_hash)
+		#output(bres)
+		orig_dgs = nacl.hash.sha256(b_data_dict_hash, encoder=nacl.encoding.HexEncoder)
+		if sodium_memcmp(data_dict_digest,orig_dgs):
+			data_dict[r.index(rep)] = eval(b_data_dict_hash.decode())
+		for y in cresult:
+			try:
+				client_rs[y].append(cresult[y])
+			except KeyError:
+				client_rs[y] = [cresult[y]] 
+		logging.info("Configuration "+str(configuration)+" Olympus ckient_rs is "+ str(client_rs) + " from replica " + str(r.index(rep)))		
+		#v3 
+		output("count " + str(count1) + " length " + str(int((len(r)-1)/2) + 1))
+		if await(count1 == int((len(r)-1)/2) + 1) :
+			flag = False
+			output("The data dicts received are: "+ str(data_dict))
+			keys = []
+			for k in data_dict:
+				keys.append(k)
+			logging.info("Configuration "+str(configuration)+" Olympus dict keys are "+str(keys))
+			match_count=0
+			for i,k in enumerate(keys):
+				if i == len(keys)-1:
+					break
+				logging.info("Configuration "+str(configuration)+" Olympus "+str(data_dict[keys[i]])+ ";"+	str(data_dict[keys[i]]))
+				if data_dict[keys[i]] != data_dict[keys[i+1]]:
+					output("control here : not matching")
+					flag = True
+					match_count =0 
+					count1=0
+					count=0
+					data_dict = dict()
+					client_rs = dict()
+					break
+				else:
+					match_count = match_count+1
+			if match_count == len(keys)-1:
+				logging.info("Configuration "+str(configuration)+" Olympus caught_up_res matched for quorum")
+				for i,k in enumerate(keys):		
+					send(("get_running_state",),to = r[k])
+					await(grs != 2)
+					if grs == 1:
+						output("control here1")
+						break
+					else :
+						output("control here2")
+						grs =2 
+				newconfig(list(data_dict.values())[0],client_rs)
+		#v3
+		elif timeout(0.01):
+			if count1>1:
+				
+				output(len(list(comb_t1)))
+				match_count =0 
+				count1=0
+				count=0
+				data_dict = dict()
+				client_rs = dict()
+				flag = True
+	def receive(msg=("get_running_state_res",data_dict_digest,data_dict_hash,cresult),from_=rep):
+		logging.info( str(rep) + "   " + str(r))
+		logging.info("Configuration "+str(configuration)+" Olympus received get_running_state_res from replica  "+ str(r.index(rep)) +"lh rep is "+ str(lhr))
+		b_data_dict_hash=nacl.encoding.HexEncoder.decode(data_dict_hash)
+		#output(bres)
+		orig_dgs = nacl.hash.sha256(b_data_dict_hash, encoder=nacl.encoding.HexEncoder)
+		if sodium_memcmp(data_dict_digest,orig_dgs):
+			if data_dict[lhr] == eval(b_data_dict_hash.decode()):
+				logging.info("Configuration "+str(configuration)+" Olympus received get_running_state_res from replica  "+ str(r.index(rep)) +" and they macthed")
+				output("about to change grs to 1")
+				grs =1 
+				output(grs)
+			else:
+				logging.info("Configuration "+str(configuration)+" Olympus received get_running_state_res from replica  "+ str(r.index(rep)) +" and they failed to macth")
+				grs = 0
+	def newconfig(data_dict,client_rs):
+		
+		configuration = configuration+1
+		failure = dict()
+		for x in config.keys():
+			if x.startswith("failures"):
+				if int(x[-4])== configuration:
+					failure[x[-2]] = config[x].split(";")
+		new_r = list(new(Replica.replica , num =num_replica))
+		old_r= r 
+		
+		logging.info("Configuration "+str(configuration)+" Olympus : new replicas created")
+		#s=sorted(lh.keys())[-1]
+		s=-1
+		h=dict()
+		count =0 
+		count1=0
+		grs=2
+		combr=[]
+		for x in new_r:
+			signing_key = nacl.signing.SigningKey.generate()
+			public_key_dict[x] = signing_key.verify_key.encode(encoder=nacl.encoding.HexEncoder)
+			private_key_dict[x] = signing_key
+		logging.info("Configuration "+str(configuration)+" Olympus : Generated Signature keys for new replicas")
+		for x in new_r :
+			
+			setup(x,(a,data_dict,h,s,new_r,x,c,public_key_dict,private_key_dict[x],nonhead_timeout,head_timeout,failure,olympus[0],configuration,checkpoint))
+		start(new_r)
+		send(("active",),to = new_r)
+		logging.info("Configuration "+str(configuration)+" Olympus : Setup  and started new replicas + client_rs"+ str(client_rs))
+		if len(client_rs) == 0:
+			for y in c:
+				send(("new-config",new_r,[],public_key_dict), to = y)
+		else:	
+			for y in client_rs:
+				send(("new-config",new_r,client_rs[y],public_key_dict), to = c[y])
+				logging.info("Configuration "+str(configuration)+" Olympus :  new replicas info sent to client")
+		send(("kill",),to=r)		
+		r=new_r	
+		self.data_dict.clear()
+		self.client_rs.clear()
+		
+	def receive(msg=("client-reconfig-request",),from_=cl):
+		
+		logging.info("Configuration "+str(configuration)+" Olympus received reconfig req from client"+str(c.index(cl))+" and sent the wedged request to replicas ")
+		send(("wedged_req",),to = r)	
+	def receive(msg=("reconfig-request",),from_=rep):
+		send(("wedge_client",),to = c)
+		logging.info("Configuration "+str(configuration)+" Olympus received reconfig req from replica"+ str(r.index(rep))+" and sent the wedged request to replicas ")
+		send(("wedged_req",),to = r)
+		
+	def run():
+		logging.basicConfig(format='%(asctime)s : %(message)s',level = logging.INFO, filename=sys.argv[-1][0:-4]+'_log.log')
+		#num_replica = config['t'] 
+		#num_replica = (num_replica*2)+1
+		#num_client = config['num_client']
+		checkpoint = int(config['checkpt_interval'])
+		head_timeout = config['head_timeout']/1000
+		nonhead_timeout = config['nonhead_timeout']/1000
+		client_timeout = config['client_timeout']/1000
+		for x in config.keys():
+			if x.startswith("failures"):
+				#output(str(x[-4]))
+				#output(str(configuration))
+				if int(x[-4]) == configuration:
+					#output(config[x])
+					failure[x[-2]] = config[x].split(";")
+		output(failure)		
+		#workload = []
+		s=-1
+		d = dict()
+		hist = dict()
+		a=False
+		
+		public_key_dict=dict()
+		private_key_dict = dict()
+		
+		signing_key = nacl.signing.SigningKey.generate()
+		public_key_dict[parent[0]] = signing_key.verify_key.encode(encoder=nacl.encoding.HexEncoder)
+		private_key_dict[parent[0]] = signing_key
+		for x in c:
+			signing_key = nacl.signing.SigningKey.generate()
+			public_key_dict[x] = signing_key.verify_key.encode(encoder=nacl.encoding.HexEncoder)
+			private_key_dict[x] = signing_key
+		logging.info("Configuration "+str(configuration)+" Olympus : Generated Signature keys for clients")	
+		for x in r:
+			signing_key = nacl.signing.SigningKey.generate()
+			public_key_dict[x] = signing_key.verify_key.encode(encoder=nacl.encoding.HexEncoder)
+			private_key_dict[x] = signing_key
+		logging.info("Configuration "+str(configuration)+" Olympus : Generated Signature keys for replicas")	
+		output(olympus[0])
+		for x in r :
+			
+			setup(x,(a,d,hist,s,r,x,c,public_key_dict,private_key_dict[x],nonhead_timeout,head_timeout,failure,olympus[0],configuration,checkpoint))
+		start(r)
+		send(("active",),to = r)
+		for i,x in enumerate(c):
+			setup(x, (config['workload['+str(i)+']'],r,c,x,public_key_dict,private_key_dict[x],client_timeout,parent[0],olympus[0]))
+		setup(parent, (c,public_key_dict,private_key_dict[parent[0]]))
+		start(c)
+		
+		start(parent)	
+		await(False)

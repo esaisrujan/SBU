@@ -1,0 +1,38 @@
+2017-11-21 23:36:39,817 : Configuration 0 Olympus : Generated Signature keys for clients
+2017-11-21 23:36:39,819 : Configuration 0 Olympus : Generated Signature keys for replicas
+2017-11-21 23:36:39,897 : Configuration 0 Olympus received reconfig req from replica0 and sent the wedged request to replicas 
+2017-11-21 23:36:39,904 : Configuration 0 Olympus received wedged statement from replica  2 with history {}
+2017-11-21 23:36:39,905 : Configuration 0 Olympus received wedged statement from replica  3 with history {}
+2017-11-21 23:36:39,906 : Configuration 0 Olympus received wedged statement from replica  4 with history {}
+2017-11-21 23:36:39,906 : Configuration 0 Olympus :enter history is {2: {}, 3: {}, 4: {}}
+2017-11-21 23:36:41,923 : Configuration 0 Olympus :lh calculated 
+2017-11-21 23:36:41,923 : Configuration 0longest history of comb (<replica:95008>, <replica:95007>, <replica:95006>) is {}
+2017-11-21 23:36:41,923 : catchup of replica 2is {}
+2017-11-21 23:36:41,924 : Configuration 0 Olympus sent catch up msg  2
+2017-11-21 23:36:41,924 : catchup of replica 3is {}
+2017-11-21 23:36:41,925 : Configuration 0 Olympus sent catch up msg  3
+2017-11-21 23:36:41,925 : catchup of replica 4is {}
+2017-11-21 23:36:41,925 : Configuration 0 Olympus sent catch up msg  4
+2017-11-21 23:36:41,926 : Configuration 0 Olympus received wedged statement from replica  1 with history {}
+2017-11-21 23:36:41,926 : replica  3 with history {}
+2017-11-21 23:36:41,927 : replica  1 with history {}
+2017-11-21 23:36:41,928 : replica  2 with history {}
+2017-11-21 23:36:41,929 : replica  4 with history {}
+2017-11-21 23:36:41,929 : Configuration 0 Olympus received caught_up_res from replica  2
+2017-11-21 23:36:41,930 : Configuration 0 Olympus ckient_rs is {} from replica 2
+2017-11-21 23:36:41,931 : Configuration 0 Olympus received caught_up_res from replica  3
+2017-11-21 23:36:41,931 : Configuration 0 Olympus ckient_rs is {} from replica 3
+2017-11-21 23:36:41,932 : Configuration 0 Olympus received caught_up_res from replica  4
+2017-11-21 23:36:41,932 : Configuration 0 Olympus ckient_rs is {} from replica 4
+2017-11-21 23:36:41,934 : Configuration 0 Olympus dict keys are [2, 3, 4]
+2017-11-21 23:36:41,934 : Configuration 0 Olympus {};{}
+2017-11-21 23:36:41,934 : Configuration 0 Olympus {};{}
+2017-11-21 23:36:41,935 : Configuration 0 Olympus caught_up_res matched for quorum
+2017-11-21 23:36:41,939 : <replica:95008>   [<replica:95005>, <replica:95004>, <replica:95008>, <replica:95007>, <replica:95006>]
+2017-11-21 23:36:41,939 : Configuration 0 Olympus received get_running_state_res from replica  2lh rep is 2
+2017-11-21 23:36:41,939 : Configuration 0 Olympus received get_running_state_res from replica  2 and they macthed
+2017-11-21 23:36:43,232 : Configuration 1 Olympus : new replicas created
+2017-11-21 23:36:43,233 : Configuration 1 Olympus : Generated Signature keys for new replicas
+2017-11-21 23:36:43,280 : Configuration 1 Olympus : Setup  and started new replicas + client_rs{}
+2017-11-21 23:36:43,746 : Parent Client : Final Results check passed for Client : 1
+2017-11-21 23:36:43,786 : Parent Client : Final Results check passed for Client : 0

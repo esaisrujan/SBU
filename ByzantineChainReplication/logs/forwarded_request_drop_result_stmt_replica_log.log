@@ -1,0 +1,234 @@
+2017-11-21 22:58:37,795 :  overall failure is  {'0': ['client_request(0,0),drop()', ' forwarded_request(0,0), drop_result_stmt()']}
+2017-11-21 22:58:37,797 : Configuration 0 Replica 0:  client 0 -head signature success for rid 0
+2017-11-21 22:58:37,797 : Configuration 0 Replica 0 Client_request failure triggered at replica 0  for client 0 message 0
+2017-11-21 22:58:37,797 : Configuration 0 Replica 0 : drop (ignoring) the incoing msg
+2017-11-21 22:58:37,799 :  overall failure is  {'0': ['client_request(0,0),drop()', ' forwarded_request(0,0), drop_result_stmt()']}
+2017-11-21 22:58:37,801 : Configuration 0 Replica 0:  client 1 -head signature success for rid 0
+2017-11-21 22:58:37,802 : Configuration 0 Replica 0:  replica 0 -> replica 1 for slot 0
+2017-11-21 22:58:37,809 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:37,809 : Configuration 0 Replica 1: shuttle from replica 0 -> replica 1 is received for slot 0
+2017-11-21 22:58:37,814 : Configuration 0 Replica 1: shuttle from replica 1 -> replica 2 is sent for slot 0
+2017-11-21 22:58:37,818 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:37,818 : Configuration 0 Replica 2: shuttle from replica 1 -> replica 2 is received for slot 0
+2017-11-21 22:58:37,822 : Configuration 0 Replica 2: shuttle from replica 2 -> replica 3 is sent for slot 0
+2017-11-21 22:58:37,826 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:37,827 : Configuration 0 Replica 3: shuttle from replica 2 -> replica 3 is received for slot 0
+2017-11-21 22:58:37,831 : Configuration 0 Replica 3: shuttle from replica 3 -> replica 4 is sent for slot 0
+2017-11-21 22:58:37,835 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:37,835 : Configuration 0 Replica 4: shuttle from replica 3 -> replica 4 is received for slot 0
+2017-11-21 22:58:37,840 : Configuration 0 Replica 4: result shuttle  from tail  -> replica 3 is sent for slot 0
+2017-11-21 22:58:37,842 : Configuration 0 Replica 3 : Replica 4 -> Replica 3 signature success
+2017-11-21 22:58:37,842 : Configuration 0 Replica 3 Reshult_shuttle cached for slot 0
+2017-11-21 22:58:37,843 : Configuration 0 Replica 4: result from tail  -> client 1 is sent for slot 0
+2017-11-21 22:58:37,848 : Configuration 0 Replica 2 : Replica 3 -> Replica 2 signature success
+2017-11-21 22:58:37,848 : Configuration 0 Replica 2 Reshult_shuttle cached for slot 0
+2017-11-21 22:58:37,849 :  overall failure is  {'0': ['client_request(0,0),drop()', ' forwarded_request(0,0), drop_result_stmt()']}
+2017-11-21 22:58:37,851 : Configuration 0 Replica 0:  client 1 -head signature success for rid 1
+2017-11-21 22:58:37,852 : Configuration 0 Replica 0:  replica 0 -> replica 1 for slot 1
+2017-11-21 22:58:37,854 : Configuration 0 Replica 1 : Replica 2 -> Replica 1 signature success
+2017-11-21 22:58:37,854 : Configuration 0 Replica 1 Reshult_shuttle cached for slot 0
+2017-11-21 22:58:37,859 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 signature success
+2017-11-21 22:58:37,860 : Configuration 0 Replica 0 Reshult_shuttle cached for slot 0
+2017-11-21 22:58:37,860 : Configuration 0 Replica 0 Reshult_shuttle reached head
+2017-11-21 22:58:37,861 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:37,861 : Configuration 0 Replica 1: shuttle from replica 0 -> replica 1 is received for slot 1
+2017-11-21 22:58:37,863 : Configuration 0 Replica 1: shuttle from replica 1 -> replica 2 is sent for slot 1
+2017-11-21 22:58:37,868 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:37,868 : Configuration 0 Replica 2: shuttle from replica 1 -> replica 2 is received for slot 1
+2017-11-21 22:58:37,870 : Configuration 0 Replica 2: shuttle from replica 2 -> replica 3 is sent for slot 1
+2017-11-21 22:58:37,874 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:37,874 : Configuration 0 Replica 3: shuttle from replica 2 -> replica 3 is received for slot 1
+2017-11-21 22:58:37,877 : Configuration 0 Replica 3: shuttle from replica 3 -> replica 4 is sent for slot 1
+2017-11-21 22:58:37,881 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:37,881 : Configuration 0 Replica 4: shuttle from replica 3 -> replica 4 is received for slot 1
+2017-11-21 22:58:37,882 : Configuration 0 Replica 4: result shuttle  from tail  -> replica 3 is sent for slot 1
+2017-11-21 22:58:37,883 : Configuration 0 Replica 4: result from tail  -> client 1 is sent for slot 1
+2017-11-21 22:58:37,884 : Configuration 0 Replica 3 : Replica 4 -> Replica 3 signature success
+2017-11-21 22:58:37,885 : Configuration 0 Replica 3 Reshult_shuttle cached for slot 1
+2017-11-21 22:58:37,888 : Configuration 0 Replica 2 : Replica 3 -> Replica 2 signature success
+2017-11-21 22:58:37,888 : Configuration 0 Replica 2 Reshult_shuttle cached for slot 1
+2017-11-21 22:58:37,892 : Configuration 0 Replica 1 : Replica 2 -> Replica 1 signature success
+2017-11-21 22:58:37,892 : Configuration 0 Replica 1 Reshult_shuttle cached for slot 1
+2017-11-21 22:58:37,896 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 signature success
+2017-11-21 22:58:37,896 : Configuration 0 Replica 0 Reshult_shuttle cached for slot 1
+2017-11-21 22:58:37,896 : Configuration 0 Replica 0 Reshult_shuttle reached head
+2017-11-21 22:58:40,793 : Configuration 0 Replica 0 : Client 0 -> Replica 0 re-transmission signature success for rid 0
+2017-11-21 22:58:40,793 : Configuration 0 Replica 0 : Client 0 -> Replica 0 re-transmission msg received for rid 0
+2017-11-21 22:58:40,794 : Configuration 0 Replica 0 : else condition enter
+2017-11-21 22:58:40,795 : Configuration 0 Replica 1 : Client 0 -> Replica 1 re-transmission signature success for rid 0
+2017-11-21 22:58:40,796 : Configuration 0 Replica 1 : Client 0 -> Replica 1 re-transmission msg received for rid 0
+2017-11-21 22:58:40,796 : Configuration 0 Replica 1 : else condition enter
+2017-11-21 22:58:40,796 : Configuration 0 Replica 1 : before sending to head
+2017-11-21 22:58:40,798 : Configuration 0 Replica 1 : Replica 1 ->Replica 0 forward request sent for client 0 rid 0
+2017-11-21 22:58:40,798 : Configuration 0 Replica 2 : Client 0 -> Replica 2 re-transmission signature success for rid 0
+2017-11-21 22:58:40,799 : Configuration 0 Replica 2 : Client 0 -> Replica 2 re-transmission msg received for rid 0
+2017-11-21 22:58:40,799 : Configuration 0 Replica 2 : else condition enter
+2017-11-21 22:58:40,800 : Configuration 0 Replica 2 : before sending to head
+2017-11-21 22:58:40,800 : Configuration 0 Replica 3 : Client 0 -> Replica 3 re-transmission signature success for rid 0
+2017-11-21 22:58:40,800 : Configuration 0 Replica 3 : Client 0 -> Replica 3 re-transmission msg received for rid 0
+2017-11-21 22:58:40,800 : Configuration 0 Replica 3 : else condition enter
+2017-11-21 22:58:40,801 : Configuration 0 Replica 3 : before sending to head
+2017-11-21 22:58:40,802 : Configuration 0 Replica 4 : Client 0 -> Replica 4 re-transmission signature success for rid 0
+2017-11-21 22:58:40,802 : Configuration 0 Replica 4 : Client 0 -> Replica 4 re-transmission msg received for rid 0
+2017-11-21 22:58:40,803 : Configuration 0 Replica 4 : else condition enter
+2017-11-21 22:58:40,802 : Configuration 0 Replica 2 : Replica 2 ->Replica 0 forward request sent for client 0 rid 0
+2017-11-21 22:58:40,803 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 forward-req signature success for rid 0
+2017-11-21 22:58:40,803 : Configuration 0 Replica 0 received forwarded request from 1 by client 0 rid 0
+2017-11-21 22:58:40,803 : Configuration 0 Replica 4 : before sending to head
+2017-11-21 22:58:40,803 : Configuration 0 Replica 0: Forward_request failure triggered at replica 0  for client 0 message 0
+2017-11-21 22:58:40,804 : Configuration 0 Replica 0: Replica 0 doesn't have the slot for Client 0  rid 0
+2017-11-21 22:58:40,805 : Configuration 0 Replica 0: Replica 0 has sent request for Client 0  rid 0 to Replica0 
+2017-11-21 22:58:40,805 : Configuration 0 Replica 0: Replica 0 has started the timer
+2017-11-21 22:58:40,808 : Configuration 0 Replica 0 : Replica 2 -> Replica 0 forward-req signature success for rid 0
+2017-11-21 22:58:40,809 : Configuration 0 Replica 4 : Replica 4 ->Replica 0 forward request sent for client 0 rid 0
+2017-11-21 22:58:40,809 : Configuration 0 Replica 0 received forwarded request from 2 by client 0 rid 0
+2017-11-21 22:58:40,809 : Configuration 0 Replica 0: Replica 0 doesn't have the slot for Client 0  rid 0
+2017-11-21 22:58:40,810 : Configuration 0 Replica 0: Replica 0 has sent request for Client 0  rid 0 to Replica0 
+2017-11-21 22:58:40,811 : Configuration 0 Replica 0: Replica 0 has started the timer
+2017-11-21 22:58:40,813 : Configuration 0 Replica 3 : Replica 3 ->Replica 0 forward request sent for client 0 rid 0
+2017-11-21 22:58:40,814 : Configuration 0 Replica 0:  replica 0 -> replica 1 for slot 2
+2017-11-21 22:58:40,818 : Configuration 0 Replica 0 : Replica 4 -> Replica 0 forward-req signature success for rid 0
+2017-11-21 22:58:40,818 : Configuration 0 Replica 0 received forwarded request from 4 by client 0 rid 0
+2017-11-21 22:58:40,818 : Configuration 0 Replica 0: Replica 0 has started timer
+2017-11-21 22:58:40,820 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:40,820 : Configuration 0 Replica 1: shuttle from replica 0 -> replica 1 is received for slot 2
+2017-11-21 22:58:40,821 : Configuration 0 Replica 0:  replica 0 -> replica 1 for slot 3
+2017-11-21 22:58:40,822 : Configuration 0 Replica 1: shuttle from replica 1 -> replica 2 is sent for slot 2
+2017-11-21 22:58:40,825 : Configuration 0 Replica 0 : Replica 3 -> Replica 0 forward-req signature success for rid 0
+2017-11-21 22:58:40,825 : Configuration 0 Replica 0 received forwarded request from 3 by client 0 rid 0
+2017-11-21 22:58:40,826 : Configuration 0 Replica 0: Replica 0 has started timer
+2017-11-21 22:58:40,826 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:40,826 : Configuration 0 Replica 2: shuttle from replica 1 -> replica 2 is received for slot 2
+2017-11-21 22:58:40,828 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:40,828 : Configuration 0 Replica 1: shuttle from replica 0 -> replica 1 is received for slot 3
+2017-11-21 22:58:40,829 : Configuration 0 Replica 2: shuttle from replica 2 -> replica 3 is sent for slot 2
+2017-11-21 22:58:40,829 : Configuration 0 Replica 1: shuttle from replica 1 -> replica 2 is sent for slot 3
+2017-11-21 22:58:40,832 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:40,833 : Configuration 0 Replica 3: shuttle from replica 2 -> replica 3 is received for slot 2
+2017-11-21 22:58:40,833 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:40,833 : Configuration 0 Replica 2: shuttle from replica 1 -> replica 2 is received for slot 3
+2017-11-21 22:58:40,835 : Configuration 0 Replica 3: shuttle from replica 3 -> replica 4 is sent for slot 2
+2017-11-21 22:58:40,836 : Configuration 0 Replica 2: shuttle from replica 2 -> replica 3 is sent for slot 3
+2017-11-21 22:58:40,839 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:40,839 : Configuration 0 Replica 4: shuttle from replica 3 -> replica 4 is received for slot 2
+2017-11-21 22:58:40,839 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:40,840 : Configuration 0 Replica 3: shuttle from replica 2 -> replica 3 is received for slot 3
+2017-11-21 22:58:40,841 : Configuration 0 Replica 4: result shuttle  from tail  -> replica 3 is sent for slot 2
+2017-11-21 22:58:40,842 : Configuration 0 Replica 3: shuttle from replica 3 -> replica 4 is sent for slot 3
+2017-11-21 22:58:40,844 : Configuration 0 Replica 4: result from tail  -> client 0 is sent for slot 2
+2017-11-21 22:58:40,845 : Configuration 0 Replica 3 : Replica 4 -> Replica 3 signature success
+2017-11-21 22:58:40,845 : Configuration 0 Replica 4 : Replica 4 -> Client 0 cached result arrived before timeout and sent to client for rid 0
+2017-11-21 22:58:40,849 : Configuration 0 Replica 2 : Replica 3 -> Replica 2 signature success
+2017-11-21 22:58:40,849 : Configuration 0 Replica 2 Reshult_shuttle cached for slot 2
+2017-11-21 22:58:40,849 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:40,849 : Configuration 0 Replica 4: shuttle from replica 3 -> replica 4 is received for slot 3
+2017-11-21 22:58:40,850 :  overall failure is  {'0': ['client_request(0,0),drop()', ' forwarded_request(0,0), drop_result_stmt()']}
+2017-11-21 22:58:40,851 : Configuration 0 Replica 0:  client 0 -head signature success for rid 1
+2017-11-21 22:58:40,852 : Configuration 0 Replica 4: result shuttle  from tail  -> replica 3 is sent for slot 3
+2017-11-21 22:58:40,853 : Configuration 0 Replica 4: result from tail  -> client 0 is sent for slot 3
+2017-11-21 22:58:40,853 : Configuration 0 Replica 1 : Replica 2 -> Replica 1 signature success
+2017-11-21 22:58:40,853 : Configuration 0 Replica 1 Reshult_shuttle cached for slot 2
+2017-11-21 22:58:40,854 : Configuration 0 Replica 0:  replica 0 -> replica 1 for slot 4
+2017-11-21 22:58:40,854 : Configuration 0 Replica 3 : Replica 4 -> Replica 3 signature success
+2017-11-21 22:58:40,854 : Configuration 0 Replica 3 Reshult_shuttle cached for slot 3
+2017-11-21 22:58:40,858 : Configuration 0 Replica 2 : Replica 3 -> Replica 2 signature success
+2017-11-21 22:58:40,858 : Configuration 0 Replica 3 : Replica 3 -> Client 0 cached result arrived before timeout and sent to client for rid 0
+2017-11-21 22:58:40,859 : Configuration 0 Replica 2 Reshult_shuttle cached for slot 3
+2017-11-21 22:58:40,859 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 signature success
+2017-11-21 22:58:40,859 : Configuration 0 Replica 0 Reshult_shuttle cached for slot 2
+2017-11-21 22:58:40,859 : Configuration 0 Replica 0 Reshult_shuttle reached head
+2017-11-21 22:58:40,861 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:40,862 : Configuration 0 Replica 1: shuttle from replica 0 -> replica 1 is received for slot 4
+2017-11-21 22:58:40,863 : Configuration 0 Replica 2 : Replica 2 -> Client 0 cached result arrived before timeout and sent to client for rid 0
+2017-11-21 22:58:40,864 : Configuration 0 Replica 1: shuttle from replica 1 -> replica 2 is sent for slot 4
+2017-11-21 22:58:40,868 : Configuration 0 Replica 1 : Replica 2 -> Replica 1 signature success
+2017-11-21 22:58:40,868 : Configuration 0 Replica 1 Reshult_shuttle cached for slot 3
+2017-11-21 22:58:40,869 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:40,869 : Configuration 0 Replica 2: shuttle from replica 1 -> replica 2 is received for slot 4
+2017-11-21 22:58:40,871 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 signature success
+2017-11-21 22:58:40,871 : Configuration 0 Replica 1 : Replica 1 -> Client 0 cached result arrived before timeout and sent to client for rid 0
+2017-11-21 22:58:40,871 : Configuration 0 Replica 0 Reshult_shuttle cached for slot 3
+2017-11-21 22:58:40,871 : Configuration 0 Replica 2: shuttle from replica 2 -> replica 3 is sent for slot 4
+2017-11-21 22:58:40,871 : Configuration 0 Replica 0 Reshult_shuttle reached head
+2017-11-21 22:58:40,875 : Configuration 0 Replica 0: Replica 0 has the result shuttle cached before timer expired and sent to Client 0  rid 0
+2017-11-21 22:58:40,876 : Configuration 0 Replica 0: Replica 0 has the result shuttle cached before timer expired and sent to Client 0  rid 0
+2017-11-21 22:58:40,876 : Configuration 0 Replica 0: Replica 0 has the result shuttle cached and sent to Client 0  rid 0
+2017-11-21 22:58:40,876 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:40,877 : Configuration 0 Replica 3: shuttle from replica 2 -> replica 3 is received for slot 4
+2017-11-21 22:58:40,877 : Configuration 0 Replica 0: Replica 0 has the result shuttle cached and sent to Client 0  rid 0
+2017-11-21 22:58:40,879 : Configuration 0 Replica 3: shuttle from replica 3 -> replica 4 is sent for slot 4
+2017-11-21 22:58:40,883 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:40,883 : Configuration 0 Replica 4: shuttle from replica 3 -> replica 4 is received for slot 4
+2017-11-21 22:58:40,885 : Configuration 0 Replica 4: result shuttle  from tail  -> replica 3 is sent for slot 4
+2017-11-21 22:58:40,886 : Configuration 0 Replica 4: result from tail  -> client 0 is sent for slot 4
+2017-11-21 22:58:40,888 : Configuration 0 Replica 3 : Replica 4 -> Replica 3 signature success
+2017-11-21 22:58:40,888 : Configuration 0 Replica 3 Reshult_shuttle cached for slot 4
+2017-11-21 22:58:40,892 : Configuration 0 Replica 2 : Replica 3 -> Replica 2 signature success
+2017-11-21 22:58:40,892 : Configuration 0 Replica 2 Reshult_shuttle cached for slot 4
+2017-11-21 22:58:40,892 :  overall failure is  {'0': ['client_request(0,0),drop()', ' forwarded_request(0,0), drop_result_stmt()']}
+2017-11-21 22:58:40,894 : Configuration 0 Replica 0:  client 0 -head signature success for rid 2
+2017-11-21 22:58:40,894 : Configuration 0 Replica 0: checkpoint triggered for slot 3
+2017-11-21 22:58:40,894 : 4 , {'jedi': 'luke', 'movie': 'star wars'}
+2017-11-21 22:58:40,895 : Configuration 0 Replica 0:  replica 0 -> replica 1 checkpoint proof sent for slot 3
+2017-11-21 22:58:40,896 : Configuration 0 Replica 1 : Replica 2 -> Replica 1 signature success
+2017-11-21 22:58:40,896 : Configuration 0 Replica 1 Reshult_shuttle cached for slot 4
+2017-11-21 22:58:40,899 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:40,899 : After fws ckp 4 , {'jedi': 'luke', 'movie': 'star wars'}
+2017-11-21 22:58:40,899 : Configuration 0 Replica 1 checkpoint proof added for slot: 4
+2017-11-21 22:58:40,900 : Configuration 0 Replica 1 checkpoint proof sent to replica: 2
+2017-11-21 22:58:40,902 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:40,902 : After fws ckp 4 , {'jedi': 'luke', 'movie': 'star wars'}
+2017-11-21 22:58:40,903 : Configuration 0 Replica 2 checkpoint proof added for slot: 4
+2017-11-21 22:58:40,904 : Configuration 0 Replica 2 checkpoint proof sent to replica: 3
+2017-11-21 22:58:40,906 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:40,906 : After fws ckp 4 , {'jedi': 'luke', 'movie': 'star wars'}
+2017-11-21 22:58:40,906 : Configuration 0 Replica 3 checkpoint proof added for slot: 4
+2017-11-21 22:58:40,908 : Configuration 0 Replica 3 checkpoint proof sent to replica: 4
+2017-11-21 22:58:40,910 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:40,910 : After fws ckp 4 , {'jedi': 'luke', 'movie': 'star wars'}
+2017-11-21 22:58:40,910 : Configuration 0 Replica 4 checkpoint proof added for slot: 4
+2017-11-21 22:58:40,911 : Configuration 0 Replica 4 history = {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["slice('jedi','0:4')", 1, 1], 2: ["put('movie','star')", 0, 0], 3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]} slot upto to be del 3 wedged hist {}
+2017-11-21 22:58:40,911 : Configuration 0 Replica 4 History Truncated {3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]}
+2017-11-21 22:58:40,912 : Configuration 0 Replica 4 Completed checkpoint proof sent to replica: 3
+2017-11-21 22:58:40,914 : Configuration 0 Replica 3: replica 4 -> replica 3signature success 
+2017-11-21 22:58:40,915 : Configuration 0 Replica 3 history = {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["slice('jedi','0:4')", 1, 1], 2: ["put('movie','star')", 0, 0], 3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]} slot upto to be del 3 wedged hist {}
+2017-11-21 22:58:40,915 : Configuration 0 Replica 3 History Truncated {3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]}
+2017-11-21 22:58:40,916 : Configuration 0 Replica 3 Completed Check point proof sent to replica: 2
+2017-11-21 22:58:40,918 : Configuration 0 Replica 2: replica 3 -> replica 2signature success 
+2017-11-21 22:58:40,920 : Configuration 0 Replica 2 history = {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["slice('jedi','0:4')", 1, 1], 2: ["put('movie','star')", 0, 0], 3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]} slot upto to be del 3 wedged hist {}
+2017-11-21 22:58:40,920 : Configuration 0 Replica 2 History Truncated {3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]}
+2017-11-21 22:58:40,921 : Configuration 0 Replica 2 Completed Check point proof sent to replica: 1
+2017-11-21 22:58:40,923 : Configuration 0 Replica 1: replica 2 -> replica 1signature success 
+2017-11-21 22:58:40,924 : Configuration 0 Replica 1 history = {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["slice('jedi','0:4')", 1, 1], 2: ["put('movie','star')", 0, 0], 3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]} slot upto to be del 3 wedged hist {}
+2017-11-21 22:58:40,924 : Configuration 0 Replica 1 History Truncated {3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1]}
+2017-11-21 22:58:40,926 : Configuration 0 Replica 1 Completed Check point proof sent to replica: 0
+2017-11-21 22:58:41,197 : Configuration 0 Replica 0:  replica 0 -> replica 1 for slot 5
+2017-11-21 22:58:41,200 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 signature success
+2017-11-21 22:58:41,200 : Configuration 0 Replica 0 Reshult_shuttle cached for slot 4
+2017-11-21 22:58:41,200 : Configuration 0 Replica 0 Reshult_shuttle reached head
+2017-11-21 22:58:41,202 : Configuration 0 Replica 1: replica 0 -> replica 1signature success 
+2017-11-21 22:58:41,202 : Configuration 0 Replica 1: shuttle from replica 0 -> replica 1 is received for slot 5
+2017-11-21 22:58:41,202 : Configuration 0 Replica 0: replica 1 -> replica 0signature success 
+2017-11-21 22:58:41,203 : Configuration 0 Replica 0 history = {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["slice('jedi','0:4')", 1, 1], 2: ["put('movie','star')", 0, 0], 3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1], 5: ["append('movie',' wars')", 0, 2]} slot upto to be del 3 wedged hist {}
+2017-11-21 22:58:41,203 : Configuration 0 Replica 0 History Truncated {3: ["put('movie','star')", 0, 0], 4: ["append('movie',' wars')", 0, 1], 5: ["append('movie',' wars')", 0, 2]}
+2017-11-21 22:58:41,204 : Configuration 0 Replica 0 Completed Check point proof reached head
+2017-11-21 22:58:41,204 : Configuration 0 Replica 1: shuttle from replica 1 -> replica 2 is sent for slot 5
+2017-11-21 22:58:41,208 : Configuration 0 Replica 2: replica 1 -> replica 2signature success 
+2017-11-21 22:58:41,209 : Configuration 0 Replica 2: shuttle from replica 1 -> replica 2 is received for slot 5
+2017-11-21 22:58:41,211 : Configuration 0 Replica 2: shuttle from replica 2 -> replica 3 is sent for slot 5
+2017-11-21 22:58:41,215 : Configuration 0 Replica 3: replica 2 -> replica 3signature success 
+2017-11-21 22:58:41,216 : Configuration 0 Replica 3: shuttle from replica 2 -> replica 3 is received for slot 5
+2017-11-21 22:58:41,218 : Configuration 0 Replica 3: shuttle from replica 3 -> replica 4 is sent for slot 5
+2017-11-21 22:58:41,223 : Configuration 0 Replica 4: replica 3 -> replica 4signature success 
+2017-11-21 22:58:41,223 : Configuration 0 Replica 4: shuttle from replica 3 -> replica 4 is received for slot 5
+2017-11-21 22:58:41,225 : Configuration 0 Replica 4: result shuttle  from tail  -> replica 3 is sent for slot 5
+2017-11-21 22:58:41,226 : Configuration 0 Replica 4: result from tail  -> client 0 is sent for slot 5
+2017-11-21 22:58:41,227 : Configuration 0 Replica 3 : Replica 4 -> Replica 3 signature success
+2017-11-21 22:58:41,227 : Configuration 0 Replica 3 Reshult_shuttle cached for slot 5
+2017-11-21 22:58:41,231 : Configuration 0 Replica 2 : Replica 3 -> Replica 2 signature success
+2017-11-21 22:58:41,231 : Configuration 0 Replica 2 Reshult_shuttle cached for slot 5
+2017-11-21 22:58:41,235 : Configuration 0 Replica 1 : Replica 2 -> Replica 1 signature success
+2017-11-21 22:58:41,235 : Configuration 0 Replica 1 Reshult_shuttle cached for slot 5
+2017-11-21 22:58:41,239 : Configuration 0 Replica 0 : Replica 1 -> Replica 0 signature success
+2017-11-21 22:58:41,240 : Configuration 0 Replica 0 Reshult_shuttle cached for slot 5
+2017-11-21 22:58:41,240 : Configuration 0 Replica 0 Reshult_shuttle reached head

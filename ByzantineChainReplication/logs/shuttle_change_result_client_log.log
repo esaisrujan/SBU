@@ -1,0 +1,26 @@
+2017-11-22 20:49:50,323 : Client 1: Client 1 sent request number 0 opration put('jedi,'luke skywalker) to replica 0
+2017-11-22 20:49:50,335 : Client 0: prec is 0 rec is 0
+2017-11-22 20:49:50,335 : Client 1: prec is 0 rec is 0
+2017-11-22 20:49:50,410 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 20:49:50,411 : Client 0: Result validation failed after receiving result from tail for rid 0
+2017-11-22 20:49:50,412 : Client 0: reconfig request sent to olympus
+2017-11-22 20:49:50,429 : Client 1:  tail to client signature success for rid +str(rid)
+2017-11-22 20:49:50,430 : Client 1: Result validation success after receiving result from tail for rid 0
+2017-11-22 20:49:50,431 : Client 1: Client 1 result arrived  for rid 0
+2017-11-22 20:49:50,432 : Client 1: Client 1 sent request number 1 opration slice('jedi','0:4') to replica 0
+2017-11-22 20:49:50,435 : Client 1: prec is 1 rec is 1
+2017-11-22 20:49:53,335 : Client 0: Client 0 timer expired for  request number 0 opration put('movie','star')
+2017-11-22 20:49:53,351 : Client 0:  Client 0 sent  request number 0 operation put('movie','star') to all replicas after timeout
+2017-11-22 20:49:53,437 : Client 1: Client 1 timer expired for  request number 1 opration slice('jedi','0:4')
+2017-11-22 20:49:53,451 : Client 1:  Client 1 sent  request number 1 operation slice('jedi','0:4') to all replicas after timeout
+2017-11-22 20:49:53,878 : Client 0: Client received new config from olympus
+2017-11-22 20:49:53,878 : Client 0 : match is 3 min match is 3.0for rid 0 rid seen [0]
+2017-11-22 20:49:53,879 : Client 0: Result validation success for new config after receiving re-transmit result from olympus
+2017-11-22 20:49:53,880 : Client 1: Client received new config from olympus
+ppend('movie',' wars') to replica 0
+2017-11-22 20:49:53,881 : Client 1 : match is 3 min match is 3.0for rid 0 rid seen [1, 0]
+2017-11-22 20:49:53,886 : Client 0: prec is 1 rec is 1
+2017-11-22 20:49:53,984 : Client 0:  tail to client signature success for rid +str(rid)
+2017-11-22 20:49:53,985 : Client 0: Result validation success after receiving result from tail for rid 1
+2017-11-22 20:49:53,986 : Client 0: Client 0 result arrived  for rid 1
+2017-11-22 20:49:53,987 : Client 0:  Client 0 sent fianl results to parent for checking

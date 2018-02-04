@@ -1,0 +1,76 @@
+2017-11-22 20:38:14,811 : Configuration 0 Olympus : Generated Signature keys for clients
+2017-11-22 20:38:14,813 : Configuration 0 Olympus : Generated Signature keys for replicas
+2017-11-22 20:38:14,960 : Configuration 0 Olympus received reconfig req from replica2 and sent the wedged request to replicas 
+2017-11-22 20:38:14,972 : Configuration 0 Olympus received wedged statement from replica  0 with history {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:14,975 : Configuration 0 Olympus received wedged statement from replica  1 with history {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:14,985 : Configuration 0 Olympus received wedged statement from replica  4 with history {}
+2017-11-22 20:38:14,985 : Configuration 0 Olympus :enter history is {0: {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}, 1: {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}, 4: {}}
+2017-11-22 20:38:14,986 : Configuration 0 Olympus received wedged statement from replica  3 with history {}
+2017-11-22 20:38:14,988 : Configuration 0 Olympus received wedged statement from replica  2 with history {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:15,993 : Configuration 0 Olympus :lh calculated 
+2017-11-22 20:38:15,993 : Configuration 0longest history of comb (<replica:04006>, <replica:04004>, <replica:04005>) is {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:15,994 : catchup of replica 0is {}
+2017-11-22 20:38:15,998 : Configuration 0 Olympus sent catch up msg  0
+2017-11-22 20:38:15,999 : catchup of replica 1is {}
+2017-11-22 20:38:16,000 : Configuration 0 Olympus sent catch up msg  1
+2017-11-22 20:38:16,000 : catchup of replica 4is {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:16,002 : Configuration 0 Olympus sent catch up msg  4
+2017-11-22 20:38:16,003 : replica  1 with history {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:16,004 : replica  0 with history {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:16,005 : replica  2 with history {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}
+2017-11-22 20:38:16,006 : replica  3 with history {}
+2017-11-22 20:38:16,007 : replica  4 with history {}
+2017-11-22 20:38:16,009 : Configuration 0 Olympus received caught_up_res from replica  0
+2017-11-22 20:38:16,010 : Configuration 0 Olympus ckient_rs is {0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]]} from replica 0
+2017-11-22 20:38:16,011 : Configuration 0 Olympus received caught_up_res from replica  1
+2017-11-22 20:38:16,013 : Configuration 0 Olympus ckient_rs is {0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]]} from replica 1
+2017-11-22 20:38:16,015 : Configuration 0 Olympus received caught_up_res from replica  4
+2017-11-22 20:38:16,015 : Configuration 0 Olympus ckient_rs is {0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]]} from replica 4
+2017-11-22 20:38:16,018 : Configuration 0 Olympus dict keys are [0, 1, 4]
+2017-11-22 20:38:16,018 : Configuration 0 Olympus {'movie': 'star', 'jedi': 'luke skywalker'};{'movie': 'star', 'jedi': 'luke skywalker'}
+2017-11-22 20:38:16,019 : Configuration 0 Olympus {'movie': 'star', 'jedi': 'luke skywalker'};{'movie': 'star', 'jedi': 'luke skywalker'}
+2017-11-22 20:38:16,019 : Configuration 0 Olympus caught_up_res matched for quorum
+2017-11-22 20:38:16,027 : <replica:04006>   [<replica:04006>, <replica:04004>, <replica:04007>, <replica:04008>, <replica:04005>]
+2017-11-22 20:38:16,027 : Configuration 0 Olympus received get_running_state_res from replica  0lh rep is 0
+2017-11-22 20:38:16,028 : Configuration 0 Olympus received get_running_state_res from replica  0 and they macthed
+2017-11-22 20:38:18,390 : Configuration 1 Olympus : new replicas created
+2017-11-22 20:38:18,392 : Configuration 1 Olympus : Generated Signature keys for new replicas
+2017-11-22 20:38:18,442 : Configuration 1 Olympus : Setup  and started new replicas + client_rs{0: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 1, 0]], 1: [[b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0], [b'2689367b205c16ce32ed4200942b8b8b1e262dfc70d9bc9fbc77c49699a4f1df', b'6f6b', 0, 0]]}
+2017-11-22 20:38:18,443 : Configuration 1 Olympus :  new replicas info sent to client
+2017-11-22 20:38:18,445 : Configuration 1 Olympus :  new replicas info sent to client
+2017-11-22 20:38:21,495 : Configuration 1 Olympus received reconfig req from replica1 and sent the wedged request to replicas 
+2017-11-22 20:38:24,520 : Configuration 1 Olympus received wedged statement from replica  1 with history {}
+2017-11-22 20:38:24,524 : Configuration 1 Olympus received wedged statement from replica  4 with history {}
+2017-11-22 20:38:24,527 : Configuration 1 Olympus received wedged statement from replica  2 with history {}
+2017-11-22 20:38:24,528 : Configuration 1 Olympus :enter history is {0: {0: ["put('jedi,'luke skywalker)", 1, 0], 1: ["put('movie','star')", 0, 0]}, 1: {}, 2: {}, 3: {}, 4: {}}
+2017-11-22 20:38:24,529 : Configuration 1 Olympus received wedged statement from replica  3 with history {}
+2017-11-22 20:38:26,548 : Configuration 1 Olympus :lh calculated 
+2017-11-22 20:38:26,549 : Configuration 1longest history of comb (<replica:74003>, <replica:74001>, <replica:74002>) is {}
+2017-11-22 20:38:26,550 : catchup of replica 1is {}
+2017-11-22 20:38:26,552 : Configuration 1 Olympus sent catch up msg  1
+2017-11-22 20:38:26,554 : catchup of replica 4is {}
+2017-11-22 20:38:26,555 : Configuration 1 Olympus sent catch up msg  4
+2017-11-22 20:38:26,556 : catchup of replica 2is {}
+2017-11-22 20:38:26,557 : Configuration 1 Olympus sent catch up msg  2
+2017-11-22 20:38:26,559 : replica  1 with history {}
+2017-11-22 20:38:26,560 : replica  2 with history {}
+2017-11-22 20:38:26,562 : replica  4 with history {}
+2017-11-22 20:38:26,564 : replica  3 with history {}
+2017-11-22 20:38:26,566 : Configuration 1 Olympus received caught_up_res from replica  1
+2017-11-22 20:38:26,566 : Configuration 1 Olympus ckient_rs is {} from replica 1
+2017-11-22 20:38:26,568 : Configuration 1 Olympus received caught_up_res from replica  4
+2017-11-22 20:38:26,568 : Configuration 1 Olympus ckient_rs is {} from replica 4
+2017-11-22 20:38:26,570 : Configuration 1 Olympus received caught_up_res from replica  2
+2017-11-22 20:38:26,570 : Configuration 1 Olympus ckient_rs is {} from replica 2
+2017-11-22 20:38:26,573 : Configuration 1 Olympus dict keys are [1, 2, 4]
+2017-11-22 20:38:26,573 : Configuration 1 Olympus {'movie': 'star', 'jedi': 'luke skywalker'};{'movie': 'star', 'jedi': 'luke skywalker'}
+2017-11-22 20:38:26,573 : Configuration 1 Olympus {'movie': 'star', 'jedi': 'luke skywalker'};{'movie': 'star', 'jedi': 'luke skywalker'}
+2017-11-22 20:38:26,574 : Configuration 1 Olympus caught_up_res matched for quorum
+2017-11-22 20:38:26,580 : <replica:74003>   [<replica:74005>, <replica:74003>, <replica:74002>, <replica:74004>, <replica:74001>]
+2017-11-22 20:38:26,581 : Configuration 1 Olympus received get_running_state_res from replica  1lh rep is 1
+2017-11-22 20:38:26,581 : Configuration 1 Olympus received get_running_state_res from replica  1 and they macthed
+2017-11-22 20:38:28,869 : Configuration 2 Olympus : new replicas created
+2017-11-22 20:38:28,870 : Configuration 2 Olympus : Generated Signature keys for new replicas
+2017-11-22 20:38:28,909 : Configuration 2 Olympus : Setup  and started new replicas + client_rs{}
+2017-11-22 20:38:29,102 : Parent Client : Final Results check passed for Client : 1
+2017-11-22 20:38:29,224 : Parent Client : Final Results check passed for Client : 0

@@ -1,0 +1,64 @@
+import sys
+import nacl.encoding
+import nacl.hash
+import nacl.signing
+from nacl.bindings.utils import sodium_memcmp
+from re import split
+import time
+import logging
+class Parent(process):
+	def setup(  c : list , public_key_dict :dict , pk: PrivateKey ):
+		self.d = dict()
+		self.result = dict()
+		self.res=""
+		#self.i=0
+	def run():
+		logging.basicConfig(format='%(asctime)s : %(message)s',level = logging.INFO, filename=sys.argv[-1][0:-4]+'_log.log')
+		res=""
+		#output(len(c))
+		#await(i==len(c))
+		#output("results matched")
+		await(False)
+	def receive(msg=("finish",client_res),from_=client):
+		if result[client] != client_res :
+			output("result check failed")
+			
+			logging.error("Parent Client : Final Results check failed for Client : "+ str(c.index(client))+" parent res "+ str(result[client])+" client res "+ str(client_res))
+		else :
+			logging.info("Parent Client : Final Results check passed for Client : "+ str(c.index(client)))
+		
+	def receive(msg=("parent-trans",encrypt_oper,encrypt_rid),from_=client):
+		cl_parent_dkey=nacl.signing.VerifyKey(public_key_dict[client], encoder=nacl.encoding.HexEncoder)
+		try:
+			cl_parent_dkey.verify(encrypt_oper)
+		except nacl.exceptions.BadSignatureError :
+			output("fr-r decrypt fail")
+		oper = encrypt_oper.message.decode()
+		x= split(r"[,()']+",oper)
+		#output(x)
+		if x[0] == "put":
+			d[x[1]] = x[2]
+			res = "ok"
+		if x[0] == "get" : 
+			try:
+				res=  d[x[1]]
+			except KeyError:
+				res=""
+		if x[0] == "append" :
+			try:
+				d[x[1]] = d[x[1]]+x[2]
+				res="update ok"
+			except KeyError:
+				res="update failed"
+		if x[0] == "slice" :
+			x[2] = x[2].split(":")
+			try:
+				d[x[1]] = d[x[1]][int(x[2][0]):int(x[2][1])]
+				res= "slice ok"
+				#output(d[x[1]])
+			except KeyError:
+				res = "slice fail"
+		try:
+			result[client].append(res)
+		except KeyError:
+			result[client]=[res]

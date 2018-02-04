@@ -1,0 +1,51 @@
+import sys
+import nacl.encoding
+import nacl.hash
+import nacl.signing
+from nacl.bindings.utils import sodium_memcmp
+from re import split
+import time
+import logging
+Olympus = import_da('Olympus')
+Parent = import_da('Parent')
+Client = import_da('Client')
+Replica = import_da('Replica')
+
+def main():
+	
+	
+	config(channel={"reliable","fifo"})
+	config = dict()
+	r = list()
+	failure=dict()
+	#logging.info('hello')
+	with open(sys.argv[-1],'r') as f:  
+		for line in f:
+			if line[0] != '#':
+			  (key,sep,val) = line.partition('=')
+			  # if the line does not contain '=', it is invalid and hence ignored
+			  if len(sep) != 0:
+				  val = val.strip()
+				  config[key.strip()] = int(val) if str.isdecimal(val) else val			
+	logging.basicConfig(format='%(asctime)s : %(message)s',level = logging.INFO, filename=sys.argv[-1][0:-4]+'_log.log')				
+	num_replica = config['t'] 
+	num_replica = (num_replica*2)+1
+	num_client = config['num_client']
+	c = list(new(Client.CL, num= num_client,at='ClientNode'))
+	r1 = list(new(Replica.replica , num =2,at='ReplicaNode1'))
+	r2 = list(new(Replica.replica , num =num_replica-2,at='ReplicaNode2'))
+	r = r1 + r2
+	olympus = list(new(Olympus.Olympus,num=1,at='OlympusNode'))
+	parent = list(new(Parent.Parent,num=1))
+	setup(olympus, (config,c,r,parent,olympus,num_replica))
+	start(olympus)
+		
+		
+		
+	
+	#workload = ["put('movie','star'); append('movie',' wars'); append('movie',' sai srujan'); slice('movie','0:13'); get('movie'); put('movie','srujan')", "get('movie')"]
+	#setup(c, (workload,r,public_key_dict,private_key_dict[c[0]],client_timeout))
+	
+	#time.sleep(6)
+	#start(c[1])
+	
