@@ -1,0 +1,44 @@
+Assignment By : Sai Srujan Eppalapally
+SBU ID: 111446560
+
+
+Aim of the Program : To develop a proxy application using the aes128 ctr encryption from openssl lib  in C.
+
+Source Files : pbproxy.c, mykey
+
+MakeFile : Makefile
+	   Commands : make pbproxy.o : to make a object file pbproxy.o from pbproxy.c
+		      make pbproxy   : to make a executable file pbproxy 
+		      make clean    : to remove pbproxy and pbproxy.o files
+Environment details:
+
+Machine : Ubuntu 16.04.3 LTS (Linux 4.10.0-35-generic x86_64)
+gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.5)
+
+
+Description : 
+
+1. The program is written to develop a  proxy for adding an extra layer of protection to publicly accessible network services such as ssh
+
+
+2. It uses pthread for multi-threading and openssl library for encrypting using aes ctr method
+
+
+
+ 
+
+Comands :
+
+make pbproxy
+
+Server : ./pbproxy -k mykey -l 2222 localhost 22
+Client : ssh -o "ProxyCommand ./pbproxy -k mykey serverhostname 2222" localhost
+
+For other ports:
+Server : nc -l -p 1234
+Server : ./pbproxy -k mykey -l 2222 localhost 1234
+Client: ./pbproxy -k mykey serverhostname 2222
+
+References : 
+1. https://stackoverflow.com/questions/29441005/aes-ctr-encryption-and-decryption for understanding the encryption procedure
+
