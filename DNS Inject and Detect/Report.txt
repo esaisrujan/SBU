@@ -1,0 +1,42 @@
+Test Environment:
+    Ubuntu 16.04.3 LTS (Linux 4.10.0-38-generic x86_64)
+
+Python Version:
+    Python 3.5
+
+Libraries used : scapy, argparse , datetime, netifaces
+
+Submitted files : dnsinject.py , dnsdetect.py
+
+Commands to run the code and sample output:
+
+part 1: sudo python3 dnsinject.py -h hostnamefile -i iface expression
+part 2: sudo python3 dnsdetect.py -r offlinefile.pcap -i iface expression ( Note : When running in offline mode, expression won't have any effect because of a bug in scapy)
+
+Output of dnsdetect with attached trace file is :
+sudo python3 dnsdetect.py -r test.pcap
+WARNING: No route found for IPv6 destination :: (no default route?). This affects only IPv6
+enp0s3
+
+test.pcap
+2017-12-09 19:04:10  DNS Poisining Attempt
+TXID 34304 Request b'www.yandex.com.'
+Answer  1  ['172.24.225.56']
+Answer  2  ['213.180.204.62']
+2017-12-09 19:04:10  DNS Poisining Attempt
+TXID 7855 Request b'www.yandex.com.'
+Answer  1  ['213.180.204.62']
+Answer  2  ['172.24.225.56']
+
+In the above output TXID 34304 is the successfull injection.
+
+Stratergy for dnsdetect :
+
+1. After sniffing a packet, check if it has a DNSRR record
+2. Accumulate the ip's in the an record with TXID as a key
+3. To detect a poison attack, when the source MAC address of the packets received differs, then the injection happended and therefore printing the results
+
+
+References:
+    https://thepacketgeek.com/scapy-p-09-scapy-and-dns/
+
